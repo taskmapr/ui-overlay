@@ -8,6 +8,12 @@ export { TaskMaprProvider, useTaskMaprClient } from './contexts/TaskMaprContext'
 // Feature contexts and hooks
 export { HighlightProvider, useHighlight } from './contexts/HighlightContext';
 export { useHighlightable } from './hooks/useHighlightable';
+export { useVisibleComponents } from './hooks/useVisibleComponents';
+export { useVisibleHtmlIds } from './hooks/useVisibleHtmlIds';
+
+// Utility functions
+export { isElementVisible, isElementFullyVisible } from './utils/visibility';
+export { getVisibleElementIds, getVisibleHtmlIds } from './utils/domVisibility';
 
 // Individual components (for advanced usage)
 export { MessageList } from './components/MessageList';

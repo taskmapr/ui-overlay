@@ -24,6 +24,21 @@ A beautiful, fully-featured overlay component that adds AI chat, UI highlighting
 npm install @taskmapr/ui-overlay
 ```
 
+## 📚 Library vs Demo Code
+
+**Important**: This repository contains both:
+
+1. **Library code** (`/src/*`) - Exported after `npm install` ✅
+   - `createTaskMaprClient` - Client factory
+   - `HighlightProvider`, `useHighlight` - Context and hooks
+   - All utility hooks and functions
+   - TypeScript types
+
+2. **Demo code** (`/src/demo/*`) - Example usage, NOT exported ⚠️
+   - Shows HOW to configure the library for your app
+   - `useTaskMapr` hook is demo-specific configuration
+   - You'll create your own version adapted to your needs
+
 ## Quick Start
 
 ```tsx

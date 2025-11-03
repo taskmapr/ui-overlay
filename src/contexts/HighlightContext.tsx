@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { HighlightableComponent, Walkthrough, WalkthroughStep } from '../types';
+import { isElementVisible } from '../utils/visibility';
 
 const WALKTHROUGH_STORAGE_KEY = 'taskmapr-active-walkthrough';
 
@@ -16,6 +17,7 @@ interface HighlightContextType {
   startWalkthrough: (steps: WalkthroughStep[], callbacks?: { onComplete?: () => void; onStepChange?: (stepIndex: number, step: WalkthroughStep) => void }) => string;
   stopWalkthrough: (walkthroughId?: string) => void;
   activeWalkthrough: Walkthrough | null;
+  getVisibleComponents: () => HighlightableComponent[];
 }
 
 const HighlightContext = createContext<HighlightContextType | undefined>(undefined);
@@ -406,6 +408,18 @@ export const HighlightProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return walkthroughId;
   }, [clearAll, highlightComponent]);
 
+  const getVisibleComponents = useCallback((): HighlightableComponent[] => {
+    const visibleComponents: HighlightableComponent[] = [];
+    
+    for (const component of componentsRef.current.values()) {
+      if (isElementVisible(component.element)) {
+        visibleComponents.push(component);
+      }
+    }
+    
+    return visibleComponents;
+  }, []);
+
   const stopWalkthrough = useCallback((walkthroughId?: string) => {
     const wt = activeWalkthroughRef.current;
     if (walkthroughId && wt?.id !== walkthroughId) {
@@ -537,7 +551,8 @@ export const HighlightProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       notifyComponentClick,
       startWalkthrough,
       stopWalkthrough,
-      activeWalkthrough
+      activeWalkthrough,
+      getVisibleComponents
     }}>
       {children}
     </HighlightContext.Provider>

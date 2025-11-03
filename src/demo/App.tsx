@@ -1,7 +1,10 @@
 import { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { WalkthroughStep } from '../types';
-import { useHighlight } from '../contexts/HighlightContext';
+import { 
+  WalkthroughStep,
+  useHighlight,
+  useVisibleHtmlIds,
+} from '../index';
 import { useTaskMapr } from './useTaskMapr';
 import { HomePage } from './pages/HomePage';
 import { FeaturesPage } from './pages/FeaturesPage';
@@ -15,6 +18,16 @@ function App() {
   
   // Initialize TaskMapr client with hook - returns client with pre-configured Overlay
   const taskmapr = useTaskMapr();
+  
+  // Use the visible HTML IDs hook - logs actual HTML id attributes
+  const { visibleIds } = useVisibleHtmlIds({ watch: true, interval: 2000 });
+  
+  // Log visible HTML IDs whenever they change
+  useEffect(() => {
+    if (visibleIds.length > 0) {
+      console.log('📊 Currently visible HTML IDs:', visibleIds);
+    }
+  }, [visibleIds]);
   
   
   // Multi-page walkthrough
