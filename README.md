@@ -1,8 +1,21 @@
-# TaskMapr Overlay
+# TaskMapr UI Overlay
 
-Cursor-style overlay for React with chat, UI highlighting, and guided walkthroughs.
+[![npm version](https://img.shields.io/npm/v/@taskmapr/ui-overlay.svg)](https://www.npmjs.com/package/@taskmapr/ui-overlay)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-**Features:** Auto-discovery • ID-based highlighting • Interactive tours • TypeScript • Dark theme
+**Bring Cursor-style AI assistance to your React applications**
+
+A beautiful, fully-featured overlay component that adds AI chat, UI highlighting, and interactive walkthroughs to any React app. Think "Cursor for websites."
+
+## ✨ Features
+
+- 💬 **Self-contained chat overlay** - Drop in one component, get full AI chat
+- 🤖 **AI agent integration** - Works with OpenAI Agents SDK, Swarm, or custom backends
+- 🎯 **Smart UI highlighting** - Auto-discover elements by ID or keywords
+- 🗺️ **Guided walkthroughs** - Create interactive product tours
+- 📘 **Full TypeScript support** - Complete type definitions included
+- 🎨 **Beautiful dark theme** - Polished UI out of the box
+- ⚡ **Zero config** - Works with mock responses when no backend is connected
 
 ## Installation
 
@@ -174,6 +187,28 @@ function App() {
 }
 ```
 
-## License
+## 🤝 Contributing
 
-MIT
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 API Reference
+
+Full API documentation coming soon. For now, check the TypeScript types in the package for complete API details.
+
+## 🐛 Issues
+
+Found a bug? Have a feature request? [Open an issue](https://github.com/taskmapr/ui-overlay/issues) on GitHub.
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🔗 Links
+
+- **npm Package**: https://www.npmjs.com/package/@taskmapr/ui-overlay
+- **GitHub Repository**: https://github.com/taskmapr/ui-overlay
+- **Issues**: https://github.com/taskmapr/ui-overlay/issues
+
+---
+
+**Built with ❤️ by TaskMapr** • Add AI superpowers to your React apps
