@@ -3,7 +3,7 @@ import { MessageListProps, Message } from '../types';
 import { useHighlight } from '../contexts/HighlightContext';
 import { cn } from '../utils/cn';
 
-export const MessageList: React.FC<MessageListProps> = ({ messages, showTimestamps = false, enableHighlighting = true }) => {
+export const MessageList: React.FC<MessageListProps> = ({ messages, showTimestamps = false, enableHighlighting = true, theme = 'dark' }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { highlight, highlightComponent } = useHighlight();
 
@@ -111,7 +111,10 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, showTimestam
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
       {messages.length === 0 ? (
-        <div className="flex items-center justify-center h-full text-chat-text-muted">
+        <div className={cn(
+          "flex items-center justify-center h-full",
+          theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+        )}>
           <p className="text-sm">No messages yet. Start a conversation!</p>
         </div>
       ) : (
@@ -128,10 +131,14 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, showTimestam
                 className={cn(
                   'max-w-[85%] rounded-lg px-4 py-2',
                   message.role === 'user'
-                    ? 'bg-chat-user text-white'
+                    ? 'bg-blue-600 text-white'
                     : message.role === 'assistant'
-                    ? 'bg-chat-assistant text-chat-text border border-chat-border'
-                    : 'bg-chat-surface text-chat-text-muted border border-chat-border'
+                    ? theme === 'dark' 
+                      ? 'bg-gray-800 text-gray-100 border border-gray-700'
+                      : 'bg-gray-100 text-gray-900 border border-gray-300'
+                    : theme === 'dark'
+                    ? 'bg-gray-800 text-gray-400 border border-gray-700'
+                    : 'bg-gray-100 text-gray-500 border border-gray-300'
                 )}
               >
                 {message.role === 'system' && (
@@ -144,7 +151,10 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, showTimestam
                 </p>
               </div>
               {showTimestamps && (
-                <span className="text-xs text-chat-text-muted px-1">
+                <span className={cn(
+                  "text-xs px-1",
+                  theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                )}>
                   {formatTime(message.timestamp)}
                 </span>
               )}

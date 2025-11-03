@@ -24,6 +24,7 @@ export const SelfContainedOverlay: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentWidth, setCurrentWidth] = useState(320);
   const [isResizing, setIsResizing] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
 
@@ -88,6 +89,10 @@ export const SelfContainedOverlay: React.FC = () => {
 
   const toggleChat = () => {
     setIsOpen((prev) => !prev);
+  };
+
+  const toggleTheme = () => {
+    setTheme((prev) => prev === 'dark' ? 'light' : 'dark');
   };
 
   const handleResizeStart = (e: React.MouseEvent) => {
@@ -175,13 +180,15 @@ export const SelfContainedOverlay: React.FC = () => {
         </svg>
       </button>
 
-      {/* Chat Panel */}
+      {/* Chat Panel - full height, but behind header */}
       <div
         className={cn(
-          'fixed top-0 right-0 h-screen bg-chat-bg shadow-2xl z-30',
+          'fixed top-0 right-0 h-screen shadow-2xl z-10',
           'flex flex-col transition-transform duration-300 ease-out',
           isOpen ? 'translate-x-0' : 'translate-x-full',
-          isResizing && 'transition-none'
+          isResizing && 'transition-none',
+          'pt-[72px]', // Add padding for header
+          theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
         )}
         style={{ width: `${currentWidth}px` }}
       >
@@ -189,10 +196,11 @@ export const SelfContainedOverlay: React.FC = () => {
         {resizable && (
           <div
             className={cn(
-              'absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize',
+              'absolute left-0 bottom-0 w-1 cursor-ew-resize',
               'hover:bg-chat-primary/50 transition-colors',
               isResizing && 'bg-chat-primary'
             )}
+            style={{ top: '72px' }}
             onMouseDown={handleResizeStart}
           >
             <div className="absolute left-0 top-0 bottom-0 w-4 -translate-x-1.5" />
@@ -200,34 +208,70 @@ export const SelfContainedOverlay: React.FC = () => {
         )}
         
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-chat-border bg-chat-surface">
-          <h2 className="text-lg font-semibold text-chat-text">{title}</h2>
-          <button
-            onClick={toggleChat}
-            className="p-1 rounded hover:bg-chat-bg transition-colors focus:outline-none focus:ring-2 focus:ring-chat-primary"
-            aria-label="Close chat"
-          >
-            <svg
-              className="w-5 h-5 text-chat-text"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        <div className={cn(
+          "flex items-center justify-between px-4 py-3 border-b",
+          theme === 'dark' 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-gray-100 border-gray-300'
+        )}>
+          <h2 className="text-lg font-semibold">{title}</h2>
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={cn(
+                "p-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+                theme === 'dark' 
+                  ? 'hover:bg-gray-700' 
+                  : 'hover:bg-gray-200'
+              )}
+              aria-label="Toggle theme"
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              {theme === 'dark' ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+              )}
+            </button>
+            {/* Close Button */}
+            <button
+              onClick={toggleChat}
+              className={cn(
+                "p-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+                theme === 'dark' 
+                  ? 'hover:bg-gray-700' 
+                  : 'hover:bg-gray-200'
+              )}
+              aria-label="Close chat"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Messages */}
         <MessageList 
           messages={messages} 
           showTimestamps={showTimestamps} 
-          enableHighlighting={enableHighlighting} 
+          enableHighlighting={enableHighlighting}
+          theme={theme}
         />
 
         {/* Input */}
@@ -235,6 +279,7 @@ export const SelfContainedOverlay: React.FC = () => {
           onSend={handleSendMessage}
           placeholder={placeholder}
           disabled={isLoading}
+          theme={theme}
         />
       </div>
     </>

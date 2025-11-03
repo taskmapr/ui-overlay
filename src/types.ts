@@ -45,12 +45,14 @@ export interface MessageInputProps {
   onSend: (message: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  theme?: 'light' | 'dark';
 }
 
 export interface MessageListProps {
   messages: Message[];
   showTimestamps?: boolean;
   enableHighlighting?: boolean;
+  theme?: 'light' | 'dark';
 }
 
 export interface HighlightableComponent {
