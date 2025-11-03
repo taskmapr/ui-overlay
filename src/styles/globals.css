@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for chat messages */
+@layer utilities {
+  .chat-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-thumb {
+    background: #3e3e42;
+    border-radius: 4px;
+  }
+  
+  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #4e4e52;
+  }
+
+  /* UI Highlight Styles */
+  .ui-highlighted {
+    position: relative;
+    outline: 3px solid rgb(59, 130, 246) !important;
+    outline-offset: 4px;
+    border-radius: 8px;
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease-in-out;
+    z-index: 10;
+    cursor: pointer !important;
+    animation: highlight-pulse 2s ease-in-out infinite;
+  }
+
+  .ui-highlighted:hover {
+    outline-color: rgb(96, 165, 250) !important;
+    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.4);
+  }
+
+  .ui-highlighted::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 12px;
+    background: rgba(59, 130, 246, 0.1);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @keyframes highlight-pulse {
+    0%, 100% {
+      outline-color: rgb(59, 130, 246);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      outline-color: rgb(96, 165, 250);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 30px rgba(96, 165, 250, 0.5);
+    }
+  }
+}

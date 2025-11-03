@@ -1,0 +1,31 @@
+# Development files
+src/demo
+src/main.tsx
+src/vite-env.d.ts
+src/styles
+
+# Documentation (except README)
+*.md
+!README.md
+ARCHITECTURE.md
+MULTI_PAGE_WALKTHROUGHS.md
+PUBLISHING.md
+CHANGELOG.md
+
+# Config files
+.env*
+vite.config.ts
+tsconfig.json
+tsconfig.node.json
+tsconfig.build.json
+tailwind.config.js
+postcss.config.js
+index.html
+
+# Build artifacts
+node_modules/
+.vscode/
+.idea/
+
+# Logs
+*.log

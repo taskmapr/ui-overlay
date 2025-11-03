@@ -1,0 +1,75 @@
+{
+  "name": "@taskmapr/ui-overlay",
+  "version": "1.0.0",
+  "description": "A React overlay component with built-in chat, UI highlighting, and guided walkthroughs - similar to Cursor for websites",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "src/components",
+    "src/contexts",
+    "src/hooks",
+    "src/lib",
+    "src/utils",
+    "src/types.ts",
+    "src/index.ts"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:types && vite build",
+    "build:types": "tsc --project tsconfig.build.json",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "chat",
+    "overlay",
+    "ui",
+    "component",
+    "highlight",
+    "walkthrough",
+    "tour",
+    "onboarding"
+  ],
+  "author": "TaskMapr",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/taskmapr/ui-overlay.git"
+  },
+  "homepage": "https://github.com/taskmapr/ui-overlay#readme",
+  "bugs": {
+    "url": "https://github.com/taskmapr/ui-overlay/issues"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "react-router-dom": "^7.9.5",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0"
+  }
+}
