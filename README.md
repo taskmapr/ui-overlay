@@ -203,6 +203,68 @@ function App() {
 }
 ```
 
+## Hooks
+
+TaskMapr provides several hooks for advanced use cases:
+
+### `useVisibleHtmlIds`
+
+Track visible DOM elements with rich metadata snapshots:
+
+```tsx
+import { useVisibleHtmlIds } from '@taskmapr/ui-overlay';
+
+function MyComponent() {
+  const { visibleIds, snapshots, refresh } = useVisibleHtmlIds({
+    watch: true,      // Auto-refresh on interval
+    interval: 2000,   // Refresh every 2 seconds
+  });
+  
+  // visibleIds: string[] - Array of HTML id attributes
+  // snapshots: VisibleElementSnapshot[] - Rich element metadata
+  
+  // Filter interactive elements
+  const interactive = snapshots.filter(s => s.isInteractive);
+  
+  return <div>{visibleIds.length} visible elements</div>;
+}
+```
+
+**`VisibleElementSnapshot` includes:**
+- `id` - HTML id attribute
+- `tagName` - Element tag (e.g., 'button', 'div')
+- `textContent` - Element text (truncated to 200 chars)
+- `classNames` - Array of CSS classes
+- `role`, `ariaLabel`, `ariaDescribedBy` - Accessibility attributes
+- `placeholder`, `value`, `type` - Input/button attributes
+- `position` - Viewport coordinates (`top`, `left`, `width`, `height`)
+- `isInteractive` - Whether element is clickable/focusable
+
+### `useVisibleComponents`
+
+Track TaskMapr's highlightable components:
+
+```tsx
+import { useVisibleComponents } from '@taskmapr/ui-overlay';
+
+const { visibleComponents, refresh } = useVisibleComponents({ watch: true });
+```
+
+### `useHighlight`
+
+Access the highlighting context:
+
+```tsx
+import { useHighlight } from '@taskmapr/ui-overlay';
+
+const { 
+  startWalkthrough, 
+  activeWalkthrough,
+  getVisibleComponents,
+  highlightComponent 
+} = useHighlight();
+```
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.

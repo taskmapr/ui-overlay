@@ -19,15 +19,28 @@ function App() {
   // Initialize TaskMapr client with hook - returns client with pre-configured Overlay
   const taskmapr = useTaskMapr();
   
-  // Use the visible HTML IDs hook - logs actual HTML id attributes
-  const { visibleIds } = useVisibleHtmlIds({ watch: true, interval: 2000 });
+  // Use the visible HTML IDs hook - now with rich element snapshots!
+  const { visibleIds, snapshots } = useVisibleHtmlIds({ watch: true, interval: 2000 });
   
-  // Log visible HTML IDs whenever they change
+  // Log visible HTML IDs and snapshots whenever they change
   useEffect(() => {
     if (visibleIds.length > 0) {
       console.log('📊 Currently visible HTML IDs:', visibleIds);
+      console.log('🔍 Element Snapshots:', snapshots);
+      
+      // Example: Log interactive elements
+      const interactiveElements = snapshots.filter(s => s.isInteractive);
+      if (interactiveElements.length > 0) {
+        console.log('🎯 Interactive elements:', interactiveElements.map(e => ({
+          id: e.id,
+          tag: e.tagName,
+          text: e.textContent?.slice(0, 50),
+          role: e.role,
+          ariaLabel: e.ariaLabel,
+        })));
+      }
     }
-  }, [visibleIds]);
+  }, [visibleIds, snapshots]);
   
   
   // Multi-page walkthrough

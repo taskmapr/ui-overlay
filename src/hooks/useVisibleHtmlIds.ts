@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getVisibleHtmlIds } from '../utils/domVisibility';
+import { getVisibleHtmlIds, getVisibleElementSnapshots, VisibleElementSnapshot } from '../utils/domVisibility';
 
 interface UseVisibleHtmlIdsOptions {
   /**
@@ -15,19 +15,27 @@ interface UseVisibleHtmlIdsOptions {
 }
 
 /**
- * Hook to get HTML id attributes of currently visible elements in the viewport
- * This captures the actual hard-coded id attributes from the DOM, not TaskMapr's internal IDs
+ * Hook to get rich snapshots of visible HTML elements in the viewport
+ * This captures actual DOM elements with id attributes and their metadata
  * @param options Configuration options
- * @returns Array of HTML id strings and a refresh function
+ * @returns Object containing:
+ *   - snapshots: Array of detailed element snapshots
+ *   - visibleIds: Array of HTML id strings (for backward compatibility)
+ *   - refresh: Function to manually trigger a refresh
  */
 export const useVisibleHtmlIds = (options: UseVisibleHtmlIdsOptions = {}) => {
   const { watch = false, interval = 1000 } = options;
+  const [snapshots, setSnapshots] = useState<VisibleElementSnapshot[]>([]);
   const [visibleIds, setVisibleIds] = useState<string[]>([]);
 
   const refresh = useCallback(() => {
+    const elementSnapshots = getVisibleElementSnapshots();
     const ids = getVisibleHtmlIds();
+    
+    setSnapshots(elementSnapshots);
     setVisibleIds(ids);
-    return ids;
+    
+    return { snapshots: elementSnapshots, ids };
   }, []);
 
   useEffect(() => {
@@ -41,7 +49,8 @@ export const useVisibleHtmlIds = (options: UseVisibleHtmlIdsOptions = {}) => {
   }, [watch, interval, refresh]);
 
   return {
-    visibleIds,
+    snapshots,
+    visibleIds, // Maintained for backward compatibility
     refresh,
   };
 };

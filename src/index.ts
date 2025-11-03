@@ -13,12 +13,14 @@ export { useVisibleHtmlIds } from './hooks/useVisibleHtmlIds';
 
 // Utility functions
 export { isElementVisible, isElementFullyVisible } from './utils/visibility';
-export { getVisibleElementIds, getVisibleHtmlIds } from './utils/domVisibility';
+export { getVisibleElementIds, getVisibleHtmlIds, getVisibleElementSnapshots } from './utils/domVisibility';
+export type { VisibleElementSnapshot } from './utils/domVisibility';
 
 // Individual components (for advanced usage)
 export { MessageList } from './components/MessageList';
 export { MessageInput } from './components/MessageInput';
 export { HighlightScanner } from './components/HighlightScanner';
+// Core types
 export type { 
   Message, 
   TaskMaprOverlayProps, 
