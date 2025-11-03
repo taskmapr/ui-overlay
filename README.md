@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@taskmapr/ui-overlay.svg)](https://www.npmjs.com/package/@taskmapr/ui-overlay)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Backed by MIT Sandbox](https://img.shields.io/badge/Backed_by-MIT_Sandbox-A31F34.svg)](https://innovation.mit.edu/entrepreneurship-2/mit-sandbox-innovation-fund/)
 
 **Bring Cursor-style AI assistance to your React applications**
 
