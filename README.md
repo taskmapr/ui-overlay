@@ -7,13 +7,13 @@ Cursor-style overlay for React with chat, UI highlighting, and guided walkthroug
 ## Installation
 
 ```bash
-npm install @taskmapr/ui-overlay
+npm install @james12340/ui-overlay
 ```
 
 ## Quick Start
 
 ```tsx
-import { createTaskMaprClient, HighlightProvider } from '@taskmapr/ui-overlay';
+import { createTaskMaprClient, HighlightProvider } from '@james12340/ui-overlay';
 
 // Initialize client once with your configuration
 const taskmapr = createTaskMaprClient(
@@ -65,7 +65,7 @@ VITE_AGENT_MODEL=gpt-4o  # optional
 ### 2. Initialize the Client
 
 ```tsx
-import { createTaskMaprClient } from '@taskmapr/ui-overlay';
+import { createTaskMaprClient } from '@james12340/ui-overlay';
 
 const taskmapr = createTaskMaprClient(
   import.meta.env.VITE_AGENT_ENDPOINT,
@@ -156,7 +156,7 @@ Users can type "show me features" or "hero" in chat to highlight elements.
 ## Walkthroughs
 
 ```tsx
-import { useHighlight } from '@taskmapr/ui-overlay';
+import { useHighlight } from '@james12340/ui-overlay';
 
 function App() {
   const { startWalkthrough } = useHighlight();
