@@ -536,7 +536,12 @@ export const SelfContainedOverlay: React.FC = () => {
                 width: '12px',
                 cursor: 'ew-resize',
                 pointerEvents: 'auto',
+                zIndex: 1001,
               } as React.CSSProperties}
+              onMouseDown={(e) => {
+                // Forward mousedown to parent
+                e.stopPropagation();
+              }}
             />
           </div>
         )}
