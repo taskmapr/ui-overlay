@@ -9,6 +9,10 @@ const __dirname = dirname(__filename)
 
 export default defineConfig({
   plugins: [react()],
+  css: {
+    // Ensure CSS is properly extracted and bundled
+    modules: false,
+  },
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
@@ -22,8 +26,15 @@ export default defineConfig({
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM'
+        },
+        // Ensure CSS is included in the bundle
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') return 'taskmapr-overlay.css';
+          return assetInfo.name || 'asset';
         }
       }
-    }
+    },
+    // Ensure CSS is extracted
+    cssCodeSplit: false,
   }
 })

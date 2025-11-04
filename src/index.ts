@@ -1,3 +1,6 @@
+// Import styles to ensure they're bundled
+import './styles/globals.css';
+
 // Legacy component (for backward compatibility)
 export { TaskMaprOverlay } from './components/TaskMaprOverlay';
 

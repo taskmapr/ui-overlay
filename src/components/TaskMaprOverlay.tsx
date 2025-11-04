@@ -117,7 +117,7 @@ export const TaskMaprOverlay: React.FC<TaskMaprOverlayProps> = ({
   }, [isResizing, minWidthPx, maxWidthPx]);
 
   return (
-    <>
+    <div className="tm-overlay-root">
       <HighlightScanner enabled={enableHighlighting} />
       
       {/* Toggle Button */}
@@ -209,6 +209,6 @@ export const TaskMaprOverlay: React.FC<TaskMaprOverlayProps> = ({
           disabled={isLoading}
         />
       </div>
-    </>
+    </div>
   );
 };

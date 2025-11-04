@@ -1,6 +1,6 @@
 {
   "name": "@taskmapr/ui-overlay",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "description": "A React overlay component with built-in chat, UI highlighting, and guided walkthroughs - similar to Cursor for websites",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -10,9 +10,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs.js"
-    }
+    },
+    "./dist/taskmapr-overlay.css": "./dist/taskmapr-overlay.css",
+    "./taskmapr-overlay.css": "./dist/taskmapr-overlay.css"
   },
-  "sideEffects": false,
+  "sideEffects": ["**/*.css", "**/styles/**/*"],
   "files": [
     "dist",
     "src/components",
@@ -64,6 +66,7 @@
     "@vitejs/plugin-react": "^4.2.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
+    "postcss-prefix-selector": "^1.16.0",
     "react-router-dom": "^7.9.5",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.0",

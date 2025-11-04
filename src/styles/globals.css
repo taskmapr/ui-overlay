@@ -2,83 +2,343 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scoped styles for TaskMapr overlay - isolated from host app */
+.tm-overlay-root {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.tm-overlay-root *,
+.tm-overlay-root *::before,
+.tm-overlay-root *::after {
+  box-sizing: inherit;
+}
+
 /* Custom scrollbar for chat messages */
-@layer utilities {
-  .chat-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .chat-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .chat-scrollbar::-webkit-scrollbar-thumb {
-    background: #3e3e42;
-    border-radius: 4px;
-  }
-  
-  .chat-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #4e4e52;
-  }
+.chat-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
 
-  /* UI Highlight Styles */
-  .ui-highlighted {
-    position: relative;
-    outline: 3px solid rgb(59, 130, 246) !important;
-    outline-offset: 4px;
-    border-radius: 8px;
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: #3e3e42;
+  border-radius: 4px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4e4e52;
+}
+
+/* UI Highlight Styles */
+.ui-highlighted {
+  position: relative;
+  outline: 3px solid rgb(59, 130, 246) !important;
+  outline-offset: 4px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease-in-out;
+  z-index: 10;
+  cursor: pointer !important;
+  animation: highlight-pulse 2s ease-in-out infinite;
+}
+
+.ui-highlighted:hover {
+  outline-color: rgb(96, 165, 250) !important;
+  box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.4);
+}
+
+.ui-highlighted::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes highlight-pulse {
+  0%, 100% {
+    outline-color: rgb(59, 130, 246);
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
-    transition: all 0.3s ease-in-out;
-    z-index: 10;
-    cursor: pointer !important;
-    animation: highlight-pulse 2s ease-in-out infinite;
   }
+  50% {
+    outline-color: rgb(96, 165, 250);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 30px rgba(96, 165, 250, 0.5);
+  }
+}
 
-  .ui-highlighted:hover {
-    outline-color: rgb(96, 165, 250) !important;
-    box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.4), 0 0 30px rgba(96, 165, 250, 0.4);
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
   }
+  51%, 100% {
+    opacity: 0;
+  }
+}
 
-  .ui-highlighted::before {
-    content: '';
-    position: absolute;
-    inset: -8px;
-    border-radius: 12px;
-    background: rgba(59, 130, 246, 0.1);
-    pointer-events: none;
-    z-index: -1;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
+  to {
+    transform: rotate(360deg);
+  }
+}
 
-  @keyframes highlight-pulse {
-    0%, 100% {
-      outline-color: rgb(59, 130, 246);
-      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4), 0 0 20px rgba(59, 130, 246, 0.3);
-    }
-    50% {
-      outline-color: rgb(96, 165, 250);
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 30px rgba(96, 165, 250, 0.5);
-    }
-  }
+.spinning {
+  animation: spin 1s linear infinite;
+}
 
-  @keyframes blink {
-    0%, 50% {
-      opacity: 1;
-    }
-    51%, 100% {
-      opacity: 0;
-    }
-  }
+/* TaskMapr Portal Overlay Styles - COMPLETE ISOLATION */
+/* Note: Styles are outside @layer to ensure they're always included */
 
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
+/* Portal container - COMPLETE ISOLATION */
+#taskmapr-overlay-portal {
+  z-index: 999999 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none !important;
+  isolation: isolate !important;
+}
 
-  .spinning {
-    animation: spin 1s linear infinite;
-  }
+#taskmapr-overlay-portal > * {
+  pointer-events: auto !important;
+  isolation: isolate !important;
+}
+
+/* Toggle button - completely isolated */
+#taskmapr-overlay-portal button[aria-label="Toggle chat"] {
+  all: initial !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+  z-index: 99999 !important;
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  background-color: #3b82f6 !important;
+  width: 56px !important;
+  height: 56px !important;
+  min-width: 56px !important;
+  min-height: 56px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 50% !important;
+  color: white !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease-out !important;
+  box-sizing: border-box !important;
+}
+
+#taskmapr-overlay-portal button[aria-label="Toggle chat"]:hover {
+  background-color: #2563eb !important;
+}
+
+#taskmapr-overlay-portal button[aria-label="Toggle chat"] svg {
+  width: 24px !important;
+  height: 24px !important;
+  color: white !important;
+  stroke: white !important;
+  fill: none !important;
+  display: block !important;
+}
+
+#taskmapr-overlay-portal button[aria-label="Toggle chat"] svg path {
+  stroke: white !important;
+  stroke-width: 2 !important;
+}
+
+/* SIDEBAR PANEL - NUCLEAR RESET + ISOLATION */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"],
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"],
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right: 0"],
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right:0"],
+#taskmapr-overlay-portal > div > div[style*="position: fixed"],
+#taskmapr-overlay-portal > div > div[style*="position:fixed"],
+#taskmapr-overlay-portal > div > div > div[style*="position: fixed"],
+#taskmapr-overlay-portal > div > div > div[style*="position:fixed"] {
+  all: initial !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: auto !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 320px !important;
+  max-width: 320px !important;
+  min-width: 280px !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  z-index: 99998 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #111827 !important;
+  color: white !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  padding-top: 72px !important;
+  box-sizing: border-box !important;
+  isolation: isolate !important;
+}
+
+/* CHILDREN OF SIDEBAR - NO FLOATING, PRESERVE LAYOUT */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] > *,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > *,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] > *,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] > * {
+  float: none !important;
+  clear: both !important;
+  box-sizing: border-box !important;
+}
+
+/* RESIZE HANDLE - keep absolute, transparent */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] > div[style*="top: 72px"],
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > div[style*="top: 72px"],
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] > div[style*="top: 72px"],
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] > div[style*="top: 72px"] {
+  position: absolute !important;
+  background: transparent !important;
+  height: auto !important;
+  width: 1px !important;
+  max-width: 1px !important;
+}
+
+/* HEADER - second child (has h2 inside) */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] > div:nth-of-type(2),
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > div:nth-of-type(2),
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] > div:nth-of-type(2),
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] > div:nth-of-type(2) {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #374151 !important;
+  background-color: #1f2937 !important;
+  color: white !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  position: relative !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* HEADER TITLE */
+#taskmapr-overlay-portal h2 {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: white !important;
+  display: block !important;
+}
+
+/* MESSAGE LIST - third child */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] > div:nth-of-type(3),
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > div:nth-of-type(3),
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] > div:nth-of-type(3),
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] > div:nth-of-type(3) {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background-color: #111827 !important;
+  color: white !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  position: relative !important;
+  height: auto !important;
+}
+
+/* INPUT AREA - last child */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] > div:last-of-type,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > div:last-of-type,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] > div:last-of-type,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] > div:last-of-type {
+  border-top: 1px solid #374151 !important;
+  background-color: #1f2937 !important;
+  color: white !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  position: relative !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* ALL ELEMENTS INSIDE SIDEBAR - NO FLOATING */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] *,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] *,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] *,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] * {
+  float: none !important;
+  clear: both !important;
+  position: relative !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* INPUTS AND TEXTAREAS */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] input,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] input,
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] textarea,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] textarea,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] input,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] input,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] textarea,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] textarea {
+  background-color: #374151 !important;
+  color: white !important;
+  border: 1px solid #4b5563 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 8px 12px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  border-radius: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* BUTTONS (except toggle) */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] button:not([aria-label="Toggle chat"]),
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] button:not([aria-label="Toggle chat"]),
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] button:not([aria-label="Toggle chat"]),
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] button:not([aria-label="Toggle chat"]) {
+  cursor: pointer !important;
+  padding: 6px 12px !important;
+  border-radius: 4px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+/* LINKS */
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] a,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] a,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] a,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] a {
+  color: #60a5fa !important;
+  text-decoration: none !important;
+}
+
+#taskmapr-overlay-portal div[style*="position: fixed"][style*="right"] a:hover,
+#taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] a:hover,
+#taskmapr-overlay-portal > div > div[style*="position: fixed"] a:hover,
+#taskmapr-overlay-portal > div > div[style*="position:fixed"] a:hover {
+  color: #93c5fd !important;
 }

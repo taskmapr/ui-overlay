@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  corePlugins: {
+    preflight: false, // Disable global resets to avoid conflicts with host apps
+  },
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
