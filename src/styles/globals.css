@@ -59,4 +59,26 @@
       box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2), 0 0 30px rgba(96, 165, 250, 0.5);
     }
   }
+
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinning {
+    animation: spin 1s linear infinite;
+  }
 }

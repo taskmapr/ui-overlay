@@ -14,7 +14,23 @@ export { useVisibleHtmlIds } from './hooks/useVisibleHtmlIds';
 // Utility functions
 export { isElementVisible, isElementFullyVisible } from './utils/visibility';
 export { getVisibleElementIds, getVisibleHtmlIds, getVisibleElementSnapshots } from './utils/domVisibility';
-export type { VisibleElementSnapshot } from './utils/domVisibility';
+
+// Agent Orchestrator (for Agent SDK integration)
+export type { 
+  AgentOrchestrator,
+  AgentOrchestratorConfig,
+  AgentContextPackage,
+  AgentOrchestratorResponse,
+  AgentAction
+} from './lib/agentOrchestrator';
+export { 
+  collectAgentContext,
+  getContextSummary,
+  getInteractiveElements,
+  getRecentUserMessages,
+  hasElementInContext
+} from './lib/contextCollector';
+export type { ContextCollectorOptions } from './lib/contextCollector';
 
 // Individual components (for advanced usage)
 export { MessageList } from './components/MessageList';
@@ -31,5 +47,6 @@ export type {
   Walkthrough,
   TaskMaprClient,
   TaskMaprClientOptions,
-  AgentFramework
+  AgentFramework,
+  VisibleElementSnapshot
 } from './types';

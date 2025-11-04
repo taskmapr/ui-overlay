@@ -1,14 +1,17 @@
 import { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { createTaskMaprClient } from '../lib/createTaskMaprClient';
 import { useHighlight } from '../contexts/HighlightContext';
 import { Message } from '../types';
+import { HttpAgentOrchestrator } from './HttpAgentOrchestrator';
 
 /**
  * Demo-specific TaskMapr client configuration
  * Handles environment configuration, mock mode, and walkthrough integration
  */
 export function useTaskMapr() {
-  const { activeWalkthrough } = useHighlight();
+  const { activeWalkthrough, highlight, highlightComponent } = useHighlight();
+  const navigate = useNavigate();
   
   // Store walkthrough in a ref so getContext can access the current value dynamically
   const activeWalkthroughRef = useRef(activeWalkthrough);
@@ -22,10 +25,25 @@ export function useTaskMapr() {
   const clientRef = useRef<ReturnType<typeof createTaskMaprClient> | null>(null);
   
   if (!clientRef.current) {
-    const agentEndpoint = import.meta.env.VITE_AGENT_ENDPOINT || '';
+    // Default to orchestrator endpoint if VITE_AGENT_ENDPOINT is not set
+    const agentEndpoint = import.meta.env.VITE_AGENT_ENDPOINT || 'http://localhost:8000/api/taskmapr/orchestrate';
+    const supabaseToken = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
     
     clientRef.current = createTaskMaprClient(agentEndpoint, {
-      // API configuration
+      // Configure HTTP Agent Orchestrator with streaming support
+      orchestrator: agentEndpoint ? {
+        orchestrator: new HttpAgentOrchestrator(agentEndpoint, {
+          getAccessToken: () => {
+            // Try to get token from Supabase client if available
+            // For now, use environment variable
+            return supabaseToken;
+          },
+          timeout: 60000, // Longer timeout for streaming
+        }),
+        includeDomSnapshots: true,
+      } : undefined,
+      
+      // API configuration (fallback for legacy mode)
       apiKey: import.meta.env.VITE_OPENAI_API_KEY,
       framework: (import.meta.env.VITE_AGENT_FRAMEWORK as 'openai-agents' | 'swarm' | 'custom') || 'openai-agents',
       model: import.meta.env.VITE_AGENT_MODEL || 'gpt-4o',
@@ -72,6 +90,43 @@ export function useTaskMapr() {
       onMessageReceived: (message: Message) => {
         console.log('Message received:', message);
         // Could add logic here to parse agent responses for walkthrough commands
+      },
+      
+      // Action handlers for executing agent actions
+      actionHandlers: {
+        navigate: (path: string) => {
+          console.log('[TaskMapr] Navigating to:', path);
+          navigate(path);
+        },
+        highlight: (selectors: string[], duration?: number) => {
+          console.log('[TaskMapr] Highlighting selectors:', selectors, 'duration:', duration);
+          // Try each selector - first try as CSS selector, then as component query
+          selectors.forEach((selector) => {
+            // If it's a CSS selector (starts with #, ., or contains [), use highlight directly
+            if (selector.startsWith('#') || selector.startsWith('.') || selector.includes('[')) {
+              highlight(selector, duration);
+            } else {
+              // Otherwise, try to find it as a component by query
+              const success = highlightComponent(selector, duration);
+              if (!success) {
+                // Fallback: try as CSS selector anyway
+                highlight(selector, duration);
+              }
+            }
+          });
+        },
+        scrollTo: (selector: string, behavior: 'smooth' | 'auto' = 'smooth') => {
+          const element = document.querySelector(selector);
+          if (element) {
+            element.scrollIntoView({ behavior });
+          }
+        },
+        click: (selector: string) => {
+          const element = document.querySelector(selector) as HTMLElement;
+          if (element) {
+            element.click();
+          }
+        },
       },
     });
   }

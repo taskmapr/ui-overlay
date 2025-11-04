@@ -27,6 +27,8 @@ export const SelfContainedOverlay: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
+  const streamingMessageIdRef = useRef<string | null>(null);
+  const processedMessageIdsRef = useRef<Set<string>>(new Set());
 
   // Configuration with defaults
   const title = overlayConfig?.title || 'Chat';
@@ -37,11 +39,83 @@ export const SelfContainedOverlay: React.FC = () => {
   const minWidthPx = 280;
   const maxWidthPx = 600;
 
+      // Handle streaming message updates via onMessageReceived callback
+  useEffect(() => {
+    // Set up streaming message handler that updates React state
+    const handleStreamingUpdate = (message: Message) => {
+      // Track streaming message ID and manage loading state
+      if (message.role === 'assistant') {
+        const isStreamingMessage = streamingMessageIdRef.current === message.id;
+        const isEmptyMessage = message.content === '';
+        
+        // If it's a new assistant message (empty or different ID), track it
+        if (!streamingMessageIdRef.current || (isEmptyMessage && !isStreamingMessage)) {
+          // Update to the actual message ID if we had a placeholder
+          streamingMessageIdRef.current = message.id;
+          setIsLoading(true);
+        }
+        // If this is the streaming message (with or without content), keep loading true
+        else if (isStreamingMessage) {
+          setIsLoading(true);
+        }
+      }
+      
+      
+      // Use functional update to ensure we get latest state
+      setMessages((prev) => {
+        const index = prev.findIndex((m) => m.id === message.id);
+        if (index >= 0) {
+          // Update existing message (for streaming updates)
+          const existing = prev[index];
+          // Only update if content actually changed to avoid unnecessary re-renders
+          if (existing.content === message.content && existing.role === message.role) {
+            // Content unchanged, return same array to prevent re-render
+            return prev;
+          }
+          // Content changed, create new array with updated message
+          const updated = [...prev];
+          updated[index] = { ...message };
+          return updated;
+        } else {
+          // Check if we've already processed this message ID to prevent duplicates
+          if (processedMessageIdsRef.current.has(message.id)) {
+            // Message already processed, don't add again
+            return prev;
+          }
+          // Mark as processed
+          processedMessageIdsRef.current.add(message.id);
+          // Add new message if not found (for initial placeholder)
+          return [...prev, { ...message }];
+        }
+      });
+    };
+
+    // Get current config and merge with our handler
+    const currentConfig = client.getConfig();
+    client.configure({
+      ...currentConfig,
+      onMessageReceived: handleStreamingUpdate,
+    });
+
+    // Cleanup: restore original callback if it existed
+    return () => {
+      const config = client.getConfig();
+      if (config.onMessageReceived === handleStreamingUpdate) {
+        // Only restore if we're still the active handler
+        const originalOnMessageReceived = clientConfig.onMessageReceived;
+        client.configure({
+          ...config,
+          onMessageReceived: originalOnMessageReceived,
+        });
+      }
+    };
+  }, [client, clientConfig]);
+
   // Handle sending messages - fully internal
   const handleSendMessage = useCallback(
     async (content: string) => {
       const userMessage: Message = {
-        id: Date.now().toString(),
+        id: `user-${Date.now()}`,
         role: 'user',
         content,
         timestamp: new Date(),
@@ -55,16 +129,52 @@ export const SelfContainedOverlay: React.FC = () => {
       }
       
       setIsLoading(true);
+      // Create a placeholder message ID for the incoming response
+      const placeholderMessageId = `assistant-${Date.now()}`;
+      streamingMessageIdRef.current = placeholderMessageId;
+      // Clear processed IDs for new message
+      processedMessageIdsRef.current.clear();
       
       try {
         // Use client to send message
+        // For streaming, messages will be added/updated via onMessageReceived callback
+        // Note: sendMessage resolves when streaming completes, so isLoading will be set to false
         const response = await client.sendMessage(content);
-        setMessages((prev) => [...prev, response]);
         
-        // Call lifecycle hook if provided
-        if (clientConfig.onMessageReceived) {
-          clientConfig.onMessageReceived(response);
+        // Track the streaming message ID (use response ID if different)
+        if (response.id !== placeholderMessageId) {
+          streamingMessageIdRef.current = response.id;
         }
+        
+        // Final message should already be in state from streaming updates via handleStreamingUpdate
+        // Since onComplete already sent the final update, we should NOT update again here
+        // This prevents duplicate messages from appearing
+        // Only perform a safety check to ensure message exists, but don't update if it does
+        setMessages((prev) => {
+          const index = prev.findIndex((m) => m.id === response.id);
+          if (index >= 0) {
+            // Message already exists from streaming - do NOT update again
+            // This prevents duplicate messages
+            return prev;
+          } else {
+            // Message missing (shouldn't happen with streaming, but safety fallback)
+            // Check for duplicates by content to avoid adding the same message twice
+            const duplicateByContent = prev.some(
+              (m) => m.role === response.role && 
+                     m.content === response.content && 
+                     Math.abs(m.timestamp.getTime() - response.timestamp.getTime()) < 1000
+            );
+            if (duplicateByContent) {
+              // Duplicate found, don't add
+              return prev;
+            }
+            return [...prev, { ...response }];
+          }
+        });
+        
+        // Streaming is complete - clear the streaming ID and set loading to false
+        streamingMessageIdRef.current = null;
+        setIsLoading(false);
       } catch (error) {
         console.error('TaskMapr error:', error);
         
@@ -74,14 +184,18 @@ export const SelfContainedOverlay: React.FC = () => {
         }
         
         const errorMessage: Message = {
-          id: Date.now().toString(),
+          id: `error-${Date.now()}`,
           role: 'assistant',
           content: `Sorry, encountered an error: ${error instanceof Error ? error.message : 'Unknown error'}`,
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, errorMessage]);
       } finally {
-        setIsLoading(false);
+        // Ensure loading is set to false when done
+        // The streaming handler will keep it true during streaming
+        if (streamingMessageIdRef.current === null) {
+          setIsLoading(false);
+        }
       }
     },
     [client, clientConfig]
@@ -272,6 +386,8 @@ export const SelfContainedOverlay: React.FC = () => {
           showTimestamps={showTimestamps} 
           enableHighlighting={enableHighlighting}
           theme={theme}
+          isLoading={isLoading}
+          streamingMessageId={streamingMessageIdRef.current}
         />
 
         {/* Input */}

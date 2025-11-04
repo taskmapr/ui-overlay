@@ -8,15 +8,16 @@
 
 A beautiful, fully-featured overlay component that adds AI chat, UI highlighting, and interactive walkthroughs to any React app. Think "Cursor for websites."
 
-## ✨ Features
+## Features
 
-- 💬 **Self-contained chat overlay** - Drop in one component, get full AI chat
-- 🤖 **AI agent integration** - Works with OpenAI Agents SDK, Swarm, or custom backends
-- 🎯 **Smart UI highlighting** - Auto-discover elements by ID or keywords
-- 🗺️ **Guided walkthroughs** - Create interactive product tours
-- 📘 **Full TypeScript support** - Complete type definitions included
-- 🎨 **Beautiful dark theme** - Polished UI out of the box
-- ⚡ **Zero config** - Works with mock responses when no backend is connected
+- Self-contained chat overlay with full AI chat
+- Agent SDK integration with OpenAI Agents SDK, Swarm, or custom backends
+- Full context (prompt, history, DOM) sent to your agent
+- Smart UI highlighting - auto-discover elements by ID or keywords
+- Guided walkthroughs for interactive product tours
+- Full TypeScript support with complete type definitions
+- Beautiful dark theme out of the box
+- Zero config - works with mock responses when no backend is connected
 
 ## Installation
 
@@ -79,97 +80,41 @@ function App() {
 
 ## AI Agent Integration
 
-Connect TaskMapr to your AI agent backend (OpenAI Agents SDK, Swarm, or custom):
+### Agent SDK Orchestration
 
-### 1. Configure Environment Variables
-
-Create a `.env` file:
-
-```bash
-VITE_AGENT_ENDPOINT=http://localhost:8000/api/agent
-VITE_OPENAI_API_KEY=sk-your-api-key
-VITE_AGENT_MODEL=gpt-4o  # optional
-```
-
-### 2. Initialize the Client
+Use this when you want full control over agent orchestration with tools that have knowledge of your repo and workflows.
 
 ```tsx
-import { createTaskMaprClient } from '@taskmapr/ui-overlay';
+import { createTaskMaprClient, AgentOrchestrator } from '@taskmapr/ui-overlay';
 
-const taskmapr = createTaskMaprClient(
-  import.meta.env.VITE_AGENT_ENDPOINT,
-  {
-    apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-    framework: 'openai-agents',  // or 'swarm' or 'custom'
-    model: 'gpt-4o',
-    instructions: 'You are a helpful assistant...',
-    overlay: {
-      title: 'AI Assistant',
-      showTimestamps: true,
-    },
+class MyAgentOrchestrator implements AgentOrchestrator {
+  async orchestrate(context) {
+    // context includes: prompt, history, domElements, pageContext
+    const response = await myAgentSDK.run({
+      prompt: context.prompt,
+      history: context.history,
+      domElements: context.domElements,
+      tools: [repoKnowledgeTool, workflowTool],
+    });
+    return { message: response };
   }
-);
-```
-
-### 3. Use in Your App
-
-The overlay is **fully self-contained** - it manages its own message state internally:
-
-```tsx
-function App() {
-  return (
-    <>
-      <YourContent />
-      <taskmapr.Overlay /> {/* That's it! */}
-    </>
-  );
 }
-```
 
-**Advanced: Manual message sending** (if needed):
-
-```tsx
-const response = await taskmapr.sendMessage('Hello', {
-  currentPage: location.pathname,
+const taskmapr = createTaskMaprClient('', {
+  orchestrator: {
+    orchestrator: new MyAgentOrchestrator(),
+    includeDomSnapshots: true,
+  },
 });
 ```
 
-### Supported Agent Frameworks
+**What your agent receives:**
+- Current user prompt
+- Full conversation history
+- All visible DOM elements (IDs, text, classes, positions, interactivity)
+- Page context (URL, title)
+- Active walkthrough state
 
-- **[OpenAI Agents SDK](https://openai.github.io/openai-agents-python/)** - Python SDK for multi-agent orchestration
-- **[OpenAI Swarm](https://github.com/openai/swarm)** - Lightweight multi-agent framework
-- **Custom** - Your own agent implementation
-
-### Expected Agent API Format
-
-Your agent endpoint should accept:
-
-```json
-{
-  "message": "user message",
-  "context": { "currentPage": "/features" },
-  "config": {
-    "model": "gpt-4o",
-    "temperature": 0.7,
-    "maxTokens": 1000,
-    "instructions": "system prompt",
-    "framework": "openai-agents"
-  }
-}
-```
-
-And return:
-
-```json
-{
-  "id": "msg-123",
-  "content": "response text",
-  "timestamp": "2024-01-01T00:00:00Z",
-  "highlight": [  // optional
-    { "selector": "#hero", "duration": 3000 }
-  ]
-}
-```
 
 ## Highlighting
 
@@ -207,63 +152,11 @@ function App() {
 
 TaskMapr provides several hooks for advanced use cases:
 
-### `useVisibleHtmlIds`
+### Hooks
 
-Track visible DOM elements with rich metadata snapshots:
-
-```tsx
-import { useVisibleHtmlIds } from '@taskmapr/ui-overlay';
-
-function MyComponent() {
-  const { visibleIds, snapshots, refresh } = useVisibleHtmlIds({
-    watch: true,      // Auto-refresh on interval
-    interval: 2000,   // Refresh every 2 seconds
-  });
-  
-  // visibleIds: string[] - Array of HTML id attributes
-  // snapshots: VisibleElementSnapshot[] - Rich element metadata
-  
-  // Filter interactive elements
-  const interactive = snapshots.filter(s => s.isInteractive);
-  
-  return <div>{visibleIds.length} visible elements</div>;
-}
-```
-
-**`VisibleElementSnapshot` includes:**
-- `id` - HTML id attribute
-- `tagName` - Element tag (e.g., 'button', 'div')
-- `textContent` - Element text (truncated to 200 chars)
-- `classNames` - Array of CSS classes
-- `role`, `ariaLabel`, `ariaDescribedBy` - Accessibility attributes
-- `placeholder`, `value`, `type` - Input/button attributes
-- `position` - Viewport coordinates (`top`, `left`, `width`, `height`)
-- `isInteractive` - Whether element is clickable/focusable
-
-### `useVisibleComponents`
-
-Track TaskMapr's highlightable components:
-
-```tsx
-import { useVisibleComponents } from '@taskmapr/ui-overlay';
-
-const { visibleComponents, refresh } = useVisibleComponents({ watch: true });
-```
-
-### `useHighlight`
-
-Access the highlighting context:
-
-```tsx
-import { useHighlight } from '@taskmapr/ui-overlay';
-
-const { 
-  startWalkthrough, 
-  activeWalkthrough,
-  getVisibleComponents,
-  highlightComponent 
-} = useHighlight();
-```
+- `useVisibleHtmlIds` - Track visible DOM elements with rich metadata
+- `useVisibleComponents` - Track TaskMapr's highlightable components
+- `useHighlight` - Access highlighting context and walkthrough functions
 
 ## 🤝 Contributing
 

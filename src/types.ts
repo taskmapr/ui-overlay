@@ -1,3 +1,35 @@
+export interface VisibleElementSnapshot {
+  /** The HTML id attribute */
+  id: string;
+  /** The element's tag name (e.g., 'div', 'button', 'input') */
+  tagName: string;
+  /** The element's text content (truncated to 200 chars) */
+  textContent: string;
+  /** Array of CSS class names */
+  classNames: string[];
+  /** The element's role attribute if present */
+  role?: string;
+  /** The element's aria-label if present */
+  ariaLabel?: string;
+  /** The element's aria-describedby if present */
+  ariaDescribedBy?: string;
+  /** The element's placeholder if it's an input */
+  placeholder?: string;
+  /** The element's value if it's an input/textarea */
+  value?: string;
+  /** The element's type if it's an input/button */
+  type?: string;
+  /** Position of the element relative to the viewport */
+  position: {
+    top: number;
+    left: number;
+    width: number;
+    height: number;
+  };
+  /** Whether the element is interactive (button, link, input, etc.) */
+  isInteractive: boolean;
+}
+
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -154,6 +186,21 @@ export interface TaskMaprClientOptions {
   
   /** Custom mock response handler */
   mockResponseHandler?: (message: string, context?: Record<string, any>) => Promise<Message>;
+  
+  /** Agent Orchestrator configuration - use this to integrate with Agent SDK */
+  orchestrator?: import('./lib/agentOrchestrator').AgentOrchestratorConfig;
+  
+  /** Action handlers for executing agent actions */
+  actionHandlers?: {
+    /** Handler for navigate actions */
+    navigate?: (path: string) => void;
+    /** Handler for highlight actions */
+    highlight?: (selectors: string[], duration?: number) => void;
+    /** Handler for scrollTo actions */
+    scrollTo?: (selector: string, behavior?: 'smooth' | 'auto') => void;
+    /** Handler for click actions */
+    click?: (selector: string) => void;
+  };
 }
 
 export interface TaskMaprClient {
