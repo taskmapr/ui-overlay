@@ -526,7 +526,19 @@ export const SelfContainedOverlay: React.FC = () => {
             }}
             draggable={false}
           >
-            {/* Invisible wider hit area for easier grabbing - events bubble to parent */}
+            {/* Invisible wider hit area - extends left for easier grabbing */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '-8px',
+                top: '0',
+                bottom: '0',
+                width: '16px',
+                cursor: 'ew-resize',
+                pointerEvents: 'auto',
+                zIndex: 1001,
+              } as React.CSSProperties}
+            />
           </div>
         )}
         
