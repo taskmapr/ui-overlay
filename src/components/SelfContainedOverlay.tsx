@@ -218,9 +218,13 @@ export const SelfContainedOverlay: React.FC = () => {
     [client, clientConfig]
   );
 
-  const toggleChat = () => {
-    setIsOpen((prev) => !prev);
-  };
+  const toggleChat = useCallback(() => {
+    setIsOpen((prev) => {
+      const newState = !prev;
+      console.log('[TaskMapr] Toggle chat:', newState ? 'open' : 'closed');
+      return newState;
+    });
+  }, []);
 
   const toggleTheme = () => {
     setTheme((prev) => prev === 'dark' ? 'light' : 'dark');
@@ -287,7 +291,15 @@ export const SelfContainedOverlay: React.FC = () => {
       
       {/* Toggle Button */}
       <button
-        onClick={toggleChat}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleChat();
+        }}
+        onMouseDown={(e) => {
+          // Prevent event bubbling
+          e.stopPropagation();
+        }}
         className={cn(
           'fixed z-40 p-4 rounded-full bg-chat-primary hover:bg-chat-primary-hover',
           'text-white shadow-lg transition-all duration-300',
@@ -297,7 +309,7 @@ export const SelfContainedOverlay: React.FC = () => {
         style={{
           // Critical inline styles to ensure visibility even without Tailwind
           position: 'fixed',
-          zIndex: 99999,
+          zIndex: 2147483001,
           bottom: '24px',
           right: isOpen ? `${currentWidth + 24}px` : '24px',
           width: '56px',
@@ -321,8 +333,10 @@ export const SelfContainedOverlay: React.FC = () => {
           // Force these styles with !important via inline styles
           background: '#3b82f6',
           backgroundImage: 'none',
+          isolation: 'isolate',
         } as React.CSSProperties}
         aria-label="Toggle chat"
+        type="button"
         onMouseEnter={(e) => {
           if (!isOpen) {
             const el = e.currentTarget as HTMLElement;
@@ -381,7 +395,7 @@ export const SelfContainedOverlay: React.FC = () => {
           top: '0',
           right: '0',
           height: '100vh',
-          zIndex: 99998,
+          zIndex: 2147483000,
           display: 'flex',
           flexDirection: 'column',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
@@ -390,6 +404,8 @@ export const SelfContainedOverlay: React.FC = () => {
           backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
           color: theme === 'dark' ? '#ffffff' : '#111827',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          pointerEvents: isOpen ? 'auto' : 'none',
+          isolation: 'isolate',
         } as React.CSSProperties}
       >
         {/* Resize Handle */}
@@ -468,7 +484,12 @@ export const SelfContainedOverlay: React.FC = () => {
             </button>
             {/* Close Button */}
             <button
-              onClick={toggleChat}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleChat();
+              }}
+              type="button"
               className={cn(
                 "p-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
                 theme === 'dark' 
