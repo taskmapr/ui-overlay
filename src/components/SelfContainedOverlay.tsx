@@ -526,33 +526,7 @@ export const SelfContainedOverlay: React.FC = () => {
             }}
             draggable={false}
           >
-            {/* Invisible wider hit area for easier grabbing */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '-4px',
-                top: '0',
-                bottom: '0',
-                width: '12px',
-                cursor: 'ew-resize',
-                pointerEvents: 'auto',
-                zIndex: 1001,
-              } as React.CSSProperties}
-              onMouseDown={(e) => {
-                // Forward mousedown to parent resize handle
-                const parent = e.currentTarget.parentElement;
-                if (parent) {
-                  const mouseEvent = new MouseEvent('mousedown', {
-                    bubbles: true,
-                    cancelable: true,
-                    clientX: e.clientX,
-                    clientY: e.clientY,
-                    button: e.button,
-                  });
-                  parent.dispatchEvent(mouseEvent);
-                }
-              }}
-            />
+            {/* Invisible wider hit area for easier grabbing - events bubble to parent */}
           </div>
         )}
         
