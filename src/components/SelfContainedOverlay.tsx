@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Message } from '../types';
 import { MessageList } from './MessageList';
 import { MessageInput } from './MessageInput';
 import { HighlightScanner } from './HighlightScanner';
 import { useTaskMaprClient } from '../contexts/TaskMaprContext';
 import { cn } from '../utils/cn';
+import { injectFallbackCSS } from '../utils/fallbackCSS';
 
 /**
  * Self-contained overlay that manages its own message state.
@@ -15,6 +17,13 @@ export const SelfContainedOverlay: React.FC = () => {
   const client = useTaskMaprClient();
   const overlayConfig = client.getOverlayConfig();
   const clientConfig = client.getConfig();
+  
+  // Inject fallback CSS on mount (safety net if host CSS isn't loaded)
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      injectFallbackCSS();
+    }
+  }, []);
   
   // Internal message state - fully managed by this component
   const [messages, setMessages] = useState<Message[]>(
@@ -29,6 +38,14 @@ export const SelfContainedOverlay: React.FC = () => {
   const resizeStartWidth = useRef(0);
   const streamingMessageIdRef = useRef<string | null>(null);
   const processedMessageIdsRef = useRef<Set<string>>(new Set());
+  
+  // Ensure we're mounted to document.body via portal
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      setMounted(true);
+    }
+  }, []);
 
   // Configuration with defaults
   const title = overlayConfig?.title || 'Chat';
@@ -259,8 +276,13 @@ export const SelfContainedOverlay: React.FC = () => {
     };
   }, [isResizing, minWidthPx, maxWidthPx]);
 
-  return (
-    <>
+  // SSR guard - don't render until mounted
+  if (!mounted || typeof document === 'undefined') {
+    return null;
+  }
+
+  const overlayContent = (
+    <div className="tm-overlay-root">
       <HighlightScanner enabled={enableHighlighting} />
       
       {/* Toggle Button */}
@@ -273,17 +295,65 @@ export const SelfContainedOverlay: React.FC = () => {
           isOpen && 'opacity-0 pointer-events-none'
         )}
         style={{
+          // Critical inline styles to ensure visibility even without Tailwind
+          position: 'fixed',
+          zIndex: 99999,
           bottom: '24px',
           right: isOpen ? `${currentWidth + 24}px` : '24px',
+          width: '56px',
+          height: '56px',
+          minWidth: '56px',
+          minHeight: '56px',
+          padding: '0',
+          margin: '0',
+          borderRadius: '50%',
+          backgroundColor: '#3b82f6',
+          color: 'white',
+          border: 'none',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           transition: isResizing ? 'none' : 'all 0.3s ease-out',
-        }}
+          opacity: isOpen ? 0 : 1,
+          pointerEvents: isOpen ? 'none' : 'auto',
+          // Force these styles with !important via inline styles
+          background: '#3b82f6',
+          backgroundImage: 'none',
+        } as React.CSSProperties}
         aria-label="Toggle chat"
+        onMouseEnter={(e) => {
+          if (!isOpen) {
+            const el = e.currentTarget as HTMLElement;
+            el.style.setProperty('background-color', '#2563eb', 'important');
+            el.style.setProperty('background', '#2563eb', 'important');
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isOpen) {
+            const el = e.currentTarget as HTMLElement;
+            el.style.setProperty('background-color', '#3b82f6', 'important');
+            el.style.setProperty('background', '#3b82f6', 'important');
+          }
+        }}
       >
         <svg
           className="w-6 h-6"
           fill="none"
           stroke="currentColor"
+          strokeWidth="2"
           viewBox="0 0 24 24"
+          style={{
+            width: '24px',
+            height: '24px',
+            minWidth: '24px',
+            minHeight: '24px',
+            display: 'block',
+            flexShrink: 0,
+            color: 'white',
+            stroke: 'white',
+          } as React.CSSProperties}
         >
           <path
             strokeLinecap="round"
@@ -304,7 +374,23 @@ export const SelfContainedOverlay: React.FC = () => {
           'pt-[72px]', // Add padding for header
           theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
         )}
-        style={{ width: `${currentWidth}px` }}
+        style={{
+          width: `${currentWidth}px`,
+          // Critical inline styles to ensure visibility even without Tailwind
+          position: 'fixed',
+          top: '0',
+          right: '0',
+          height: '100vh',
+          zIndex: 99998,
+          display: 'flex',
+          flexDirection: 'column',
+          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          transition: isResizing ? 'none' : 'transform 0.3s ease-out',
+          paddingTop: '72px',
+          backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
+          color: theme === 'dark' ? '#ffffff' : '#111827',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        } as React.CSSProperties}
       >
         {/* Resize Handle */}
         {resizable && (
@@ -322,14 +408,42 @@ export const SelfContainedOverlay: React.FC = () => {
         )}
         
         {/* Header */}
-        <div className={cn(
-          "flex items-center justify-between px-4 py-3 border-b",
-          theme === 'dark' 
-            ? 'bg-gray-800 border-gray-700' 
-            : 'bg-gray-100 border-gray-300'
-        )}>
-          <h2 className="text-lg font-semibold">{title}</h2>
-          <div className="flex items-center gap-2">
+        <div 
+          className={cn(
+            "flex items-center justify-between px-4 py-3 border-b",
+            theme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-gray-100 border-gray-300'
+          )}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 16px',
+            borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#d1d5db'}`,
+            backgroundColor: theme === 'dark' ? '#1f2937' : '#f3f4f6',
+            color: theme === 'dark' ? '#ffffff' : '#111827',
+          } as React.CSSProperties}
+        >
+          <h2 
+            className="text-lg font-semibold"
+            style={{
+              fontSize: '18px',
+              fontWeight: 600,
+              margin: 0,
+              padding: 0,
+            } as React.CSSProperties}
+          >
+            {title}
+          </h2>
+          <div 
+            className="flex items-center gap-2"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+            } as React.CSSProperties}
+          >
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -398,6 +512,9 @@ export const SelfContainedOverlay: React.FC = () => {
           theme={theme}
         />
       </div>
-    </>
+    </div>
   );
+
+  // Portal to document.body to ensure visibility and escape any parent stacking contexts
+  return createPortal(overlayContent, document.body);
 };

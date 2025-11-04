@@ -16,7 +16,9 @@
   },
   "sideEffects": [
     "**/*.css",
-    "**/styles/**/*"
+    "**/styles/**/*",
+    "dist/taskmapr-overlay.css",
+    "dist/styles.css"
   ],
   "files": [
     "dist",
