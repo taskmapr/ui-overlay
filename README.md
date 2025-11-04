@@ -17,13 +17,25 @@ A beautiful, fully-featured overlay component that adds AI chat, UI highlighting
 - Guided walkthroughs for interactive product tours
 - Full TypeScript support with complete type definitions
 - Beautiful dark theme out of the box
+- All styles bundled - no CSS overrides needed
 - Zero config - works with mock responses when no backend is connected
+- Easy setup - just `npm install` and one CSS import
 
 ## Installation
 
 ```bash
 npm install @taskmapr/ui-overlay
 ```
+
+## Setup
+
+The library includes all necessary styles bundled. Simply import the CSS file:
+
+```tsx
+import '@taskmapr/ui-overlay/taskmapr-overlay.css';
+```
+
+**That's it!** No additional CSS files or overrides needed. The library handles all styling internally.
 
 ## 📚 Library vs Demo Code
 
@@ -45,6 +57,8 @@ npm install @taskmapr/ui-overlay
 
 ```tsx
 import { createTaskMaprClient, HighlightProvider } from '@taskmapr/ui-overlay';
+// Import the bundled CSS (all styles included, no overrides needed!)
+import '@taskmapr/ui-overlay/taskmapr-overlay.css';
 
 // Initialize client once with your configuration
 const taskmapr = createTaskMaprClient(
@@ -78,6 +92,8 @@ function App() {
   );
 }
 ```
+
+**Minimal Setup**: Just two imports and you're ready to go. No CSS overrides, no configuration files - the library handles everything internally.
 
 ## AI Agent Integration
 
