@@ -251,19 +251,66 @@ export const SelfContainedOverlay: React.FC = () => {
     resizeStartWidth.current = currentWidth;
   };
 
-  // Handle body margin to push content
+  // Handle body padding and main content container to push content
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.marginRight = `${currentWidth}px`;
-      document.body.style.transition = isResizing ? 'none' : 'margin-right 0.3s ease-out';
-    } else {
-      document.body.style.marginRight = '0px';
-      document.body.style.transition = 'margin-right 0.3s ease-out';
-    }
+    if (typeof document === 'undefined') return;
+    
+    const marginValue = isOpen ? `${currentWidth}px` : '0px';
+    const transition = isResizing ? 'none' : 'padding-right 0.3s ease-out, margin-right 0.3s ease-out';
+    
+    // Adjust body padding (more reliable than margin for overflow)
+    document.body.style.paddingRight = marginValue;
+    document.body.style.transition = transition;
+    
+    // Also adjust main content containers that might be used by React Admin
+    // Try common selectors for main content areas
+    const mainContentSelectors = [
+      '#root > div',
+      'main',
+      '[role="main"]',
+      '.MuiContainer-root',
+      '.ra-layout-content',
+      '.ra-layout',
+    ];
+    
+    const adjustedElements: HTMLElement[] = [];
+    
+    mainContentSelectors.forEach(selector => {
+      const elements = document.querySelectorAll<HTMLElement>(selector);
+      elements.forEach(el => {
+        // Only adjust if it's a direct child of body or within a reasonable container
+        if (el.offsetParent !== null) {
+          const originalPadding = el.style.paddingRight || '';
+          const originalMargin = el.style.marginRight || '';
+          
+          el.style.paddingRight = marginValue;
+          el.style.marginRight = marginValue;
+          el.style.transition = transition;
+          
+          adjustedElements.push(el);
+          
+          // Store original values for cleanup
+          if (!el.dataset.tmOriginalPadding) {
+            el.dataset.tmOriginalPadding = originalPadding;
+            el.dataset.tmOriginalMargin = originalMargin;
+          }
+        }
+      });
+    });
 
     return () => {
-      document.body.style.marginRight = '0px';
+      document.body.style.paddingRight = '';
+      document.body.style.marginRight = '';
       document.body.style.transition = '';
+      
+      // Restore original values
+      adjustedElements.forEach(el => {
+        el.style.paddingRight = el.dataset.tmOriginalPadding || '';
+        el.style.marginRight = el.dataset.tmOriginalMargin || '';
+        el.style.transition = '';
+        delete el.dataset.tmOriginalPadding;
+        delete el.dataset.tmOriginalMargin;
+      });
     };
   }, [isOpen, currentWidth, isResizing]);
 
