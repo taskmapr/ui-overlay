@@ -38,6 +38,7 @@ export const SelfContainedOverlay: React.FC = () => {
   const resizeStartWidth = useRef(0);
   const streamingMessageIdRef = useRef<string | null>(null);
   const processedMessageIdsRef = useRef<Set<string>>(new Set());
+  const isResizingRef = useRef(false);
   
   // Ensure we're mounted to document.body via portal
   const [mounted, setMounted] = useState(false);
@@ -243,18 +244,60 @@ export const SelfContainedOverlay: React.FC = () => {
     }
   }, [isOpen]);
 
-  const handleResizeStart = (e: React.MouseEvent) => {
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
     if (!resizable) return;
     e.preventDefault();
     e.stopPropagation();
     console.log('[TaskMapr] Resize start:', e.clientX, 'current width:', currentWidth);
-    setIsResizing(true);
+    
     resizeStartX.current = e.clientX;
     resizeStartWidth.current = currentWidth;
+    isResizingRef.current = true;
+    setIsResizing(true);
+    
     // Prevent text selection during resize
     document.body.style.userSelect = 'none';
     document.body.style.cursor = 'ew-resize';
-  };
+    
+    // Set up event listeners immediately (don't wait for useEffect)
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      moveEvent.preventDefault();
+      moveEvent.stopPropagation();
+      const deltaX = resizeStartX.current - moveEvent.clientX;
+      const newWidth = Math.min(
+        Math.max(resizeStartWidth.current + deltaX, minWidthPx),
+        maxWidthPx
+      );
+      console.log('[TaskMapr] Resize move:', moveEvent.clientX, 'delta:', deltaX, 'new width:', newWidth);
+      setCurrentWidth(newWidth);
+    };
+
+    const handleMouseUp = (upEvent: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      upEvent.preventDefault();
+      upEvent.stopPropagation();
+      console.log('[TaskMapr] Resize end');
+      isResizingRef.current = false;
+      setIsResizing(false);
+      // Restore text selection
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
+      
+      // Remove listeners
+      document.removeEventListener('mousemove', handleMouseMove, { capture: true });
+      document.removeEventListener('mouseup', handleMouseUp, { capture: true });
+      window.removeEventListener('mousemove', handleMouseMove, { capture: true });
+      window.removeEventListener('mouseup', handleMouseUp, { capture: true });
+    };
+
+    // Add listeners immediately with capture phase
+    const options = { capture: true, passive: false };
+    document.addEventListener('mousemove', handleMouseMove, options);
+    document.addEventListener('mouseup', handleMouseUp, options);
+    window.addEventListener('mousemove', handleMouseMove, options);
+    window.addEventListener('mouseup', handleMouseUp, options);
+  }, [resizable, currentWidth, minWidthPx, maxWidthPx]);
 
   // Handle body padding and main content container to push content
   useEffect(() => {
@@ -319,47 +362,16 @@ export const SelfContainedOverlay: React.FC = () => {
     };
   }, [isOpen, currentWidth, isResizing]);
 
-  // Handle resize drag
+  // Cleanup resize state when component unmounts
   useEffect(() => {
-    if (!isResizing) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const deltaX = resizeStartX.current - e.clientX;
-      const newWidth = Math.min(
-        Math.max(resizeStartWidth.current + deltaX, minWidthPx),
-        maxWidthPx
-      );
-      console.log('[TaskMapr] Resize move:', e.clientX, 'delta:', deltaX, 'new width:', newWidth);
-      setCurrentWidth(newWidth);
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('[TaskMapr] Resize end');
-      setIsResizing(false);
-      // Restore text selection
-      document.body.style.userSelect = '';
-      document.body.style.cursor = '';
-    };
-
-    // Use capture phase to ensure we catch events even if they bubble
-    const options = { capture: true, passive: false };
-    document.addEventListener('mousemove', handleMouseMove, options);
-    document.addEventListener('mouseup', handleMouseUp, options);
-    // Also listen on window in case document events don't fire
-    window.addEventListener('mousemove', handleMouseMove, options);
-    window.addEventListener('mouseup', handleMouseUp, options);
-
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove, options);
-      document.removeEventListener('mouseup', handleMouseUp, options);
-      window.removeEventListener('mousemove', handleMouseMove, options);
-      window.removeEventListener('mouseup', handleMouseUp, options);
+      if (isResizingRef.current) {
+        document.body.style.userSelect = '';
+        document.body.style.cursor = '';
+        isResizingRef.current = false;
+      }
     };
-  }, [isResizing, minWidthPx, maxWidthPx]);
+  }, []);
 
   // SSR guard - don't render until mounted
   if (!mounted || typeof document === 'undefined') {
