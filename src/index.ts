@@ -23,6 +23,7 @@ export type {
   AgentOrchestratorResponse,
   AgentAction
 } from './lib/agentOrchestrator';
+export { HttpAgentOrchestrator } from './lib/HttpAgentOrchestrator';
 export { 
   collectAgentContext,
   getContextSummary,

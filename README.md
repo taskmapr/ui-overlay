@@ -31,6 +31,7 @@ npm install @taskmapr/ui-overlay
 
 1. **Library code** (`/src/*`) - Exported after `npm install` ✅
    - `createTaskMaprClient` - Client factory
+   - `HttpAgentOrchestrator` - HTTP-based orchestrator with SSE streaming
    - `HighlightProvider`, `useHighlight` - Context and hooks
    - All utility hooks and functions
    - TypeScript types
@@ -80,7 +81,38 @@ function App() {
 
 ## AI Agent Integration
 
-### Agent SDK Orchestration
+### HTTP Agent Orchestrator (Recommended)
+
+For most use cases, use the built-in `HttpAgentOrchestrator` to connect to a TaskMapr backend server with SSE streaming support:
+
+```tsx
+import { createTaskMaprClient, HttpAgentOrchestrator } from '@taskmapr/ui-overlay';
+
+const agentEndpoint = 'http://localhost:8000/api/taskmapr/orchestrate';
+
+const taskmapr = createTaskMaprClient(agentEndpoint, {
+  orchestrator: {
+    orchestrator: new HttpAgentOrchestrator(agentEndpoint, {
+      getAccessToken: () => yourSupabaseToken, // Optional: for auth
+      timeout: 60000, // Optional: request timeout
+    }),
+    includeDomSnapshots: true,
+  },
+  overlay: {
+    title: 'AI Assistant',
+    placeholder: 'Ask me anything...',
+  },
+});
+```
+
+**Features:**
+- ✅ SSE (Server-Sent Events) streaming support
+- ✅ Real-time text streaming with `text_delta` events
+- ✅ Reasoning and tool call notifications
+- ✅ Automatic error handling and retries
+- ✅ Works with TaskMapr orchestrator backend
+
+### Custom Agent SDK Orchestration
 
 Use this when you want full control over agent orchestration with tools that have knowledge of your repo and workflows.
 

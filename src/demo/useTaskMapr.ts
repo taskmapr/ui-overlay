@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createTaskMaprClient } from '../lib/createTaskMaprClient';
 import { useHighlight } from '../contexts/HighlightContext';
 import { Message } from '../types';
-import { HttpAgentOrchestrator } from './HttpAgentOrchestrator';
+import { HttpAgentOrchestrator } from '../lib/HttpAgentOrchestrator';
 
 /**
  * Demo-specific TaskMapr client configuration
