@@ -539,8 +539,18 @@ export const SelfContainedOverlay: React.FC = () => {
                 zIndex: 1001,
               } as React.CSSProperties}
               onMouseDown={(e) => {
-                // Forward mousedown to parent
-                e.stopPropagation();
+                // Forward mousedown to parent resize handle
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  const mouseEvent = new MouseEvent('mousedown', {
+                    bubbles: true,
+                    cancelable: true,
+                    clientX: e.clientX,
+                    clientY: e.clientY,
+                    button: e.button,
+                  });
+                  parent.dispatchEvent(mouseEvent);
+                }
               }}
             />
           </div>
