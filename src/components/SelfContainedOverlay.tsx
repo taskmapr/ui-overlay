@@ -230,6 +230,19 @@ export const SelfContainedOverlay: React.FC = () => {
     setTheme((prev) => prev === 'dark' ? 'light' : 'dark');
   };
 
+  // Use ref to access panel element and update transform when isOpen changes
+  const panelRef = useRef<HTMLDivElement>(null);
+  
+  // Update transform when isOpen changes
+  useEffect(() => {
+    if (panelRef.current) {
+      const transform = isOpen ? 'translateX(0)' : 'translateX(100%)';
+      panelRef.current.style.setProperty('transform', transform, 'important');
+      panelRef.current.style.setProperty('-webkit-transform', transform, 'important');
+      panelRef.current.style.setProperty('pointer-events', isOpen ? 'auto' : 'none', 'important');
+    }
+  }, [isOpen]);
+
   const handleResizeStart = (e: React.MouseEvent) => {
     if (!resizable) return;
     e.preventDefault();
@@ -383,7 +396,6 @@ export const SelfContainedOverlay: React.FC = () => {
         className={cn(
           'fixed top-0 right-0 h-screen shadow-2xl z-10',
           'flex flex-col transition-transform duration-300 ease-out',
-          isOpen ? 'translate-x-0' : 'translate-x-full',
           isResizing && 'transition-none',
           'pt-[72px]', // Add padding for header
           theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
@@ -396,9 +408,10 @@ export const SelfContainedOverlay: React.FC = () => {
           right: '0',
           height: '100vh',
           zIndex: 2147483000,
-          display: 'flex',
+          display: isOpen ? 'flex' : 'flex',
           flexDirection: 'column',
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
+          WebkitTransform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: isResizing ? 'none' : 'transform 0.3s ease-out',
           paddingTop: '72px',
           backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
@@ -407,6 +420,7 @@ export const SelfContainedOverlay: React.FC = () => {
           pointerEvents: isOpen ? 'auto' : 'none',
           isolation: 'isolate',
         } as React.CSSProperties}
+        ref={panelRef}
       >
         {/* Resize Handle */}
         {resizable && (
