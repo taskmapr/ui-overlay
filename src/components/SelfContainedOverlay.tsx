@@ -246,9 +246,13 @@ export const SelfContainedOverlay: React.FC = () => {
   const handleResizeStart = (e: React.MouseEvent) => {
     if (!resizable) return;
     e.preventDefault();
+    e.stopPropagation();
     setIsResizing(true);
     resizeStartX.current = e.clientX;
     resizeStartWidth.current = currentWidth;
+    // Prevent text selection during resize
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ew-resize';
   };
 
   // Handle body padding and main content container to push content
@@ -329,6 +333,9 @@ export const SelfContainedOverlay: React.FC = () => {
 
     const handleMouseUp = () => {
       setIsResizing(false);
+      // Restore text selection
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -473,14 +480,43 @@ export const SelfContainedOverlay: React.FC = () => {
         {resizable && (
           <div
             className={cn(
-              'absolute left-0 bottom-0 w-1 cursor-ew-resize',
+              'absolute left-0 bottom-0 cursor-ew-resize',
               'hover:bg-chat-primary/50 transition-colors',
               isResizing && 'bg-chat-primary'
             )}
-            style={{ top: '72px' }}
-            onMouseDown={handleResizeStart}
+            style={{
+              top: '72px',
+              left: '0',
+              bottom: '0',
+              width: '4px',
+              minWidth: '4px',
+              zIndex: 10,
+              cursor: 'ew-resize',
+              position: 'absolute',
+              pointerEvents: 'auto',
+              userSelect: 'none',
+            } as React.CSSProperties}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleResizeStart(e);
+            }}
+            onDragStart={(e) => {
+              e.preventDefault();
+            }}
           >
-            <div className="absolute left-0 top-0 bottom-0 w-4 -translate-x-1.5" />
+            {/* Invisible wider hit area for easier grabbing */}
+            <div
+              style={{
+                position: 'absolute',
+                left: '-4px',
+                top: '0',
+                bottom: '0',
+                width: '12px',
+                cursor: 'ew-resize',
+                pointerEvents: 'auto',
+              } as React.CSSProperties}
+            />
           </div>
         )}
         
