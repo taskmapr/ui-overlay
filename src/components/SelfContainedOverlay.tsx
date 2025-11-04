@@ -247,6 +247,7 @@ export const SelfContainedOverlay: React.FC = () => {
     if (!resizable) return;
     e.preventDefault();
     e.stopPropagation();
+    console.log('[TaskMapr] Resize start:', e.clientX, 'current width:', currentWidth);
     setIsResizing(true);
     resizeStartX.current = e.clientX;
     resizeStartWidth.current = currentWidth;
@@ -323,27 +324,40 @@ export const SelfContainedOverlay: React.FC = () => {
     if (!isResizing) return;
 
     const handleMouseMove = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
       const deltaX = resizeStartX.current - e.clientX;
       const newWidth = Math.min(
         Math.max(resizeStartWidth.current + deltaX, minWidthPx),
         maxWidthPx
       );
+      console.log('[TaskMapr] Resize move:', e.clientX, 'delta:', deltaX, 'new width:', newWidth);
       setCurrentWidth(newWidth);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('[TaskMapr] Resize end');
       setIsResizing(false);
       // Restore text selection
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    // Use capture phase to ensure we catch events even if they bubble
+    const options = { capture: true, passive: false };
+    document.addEventListener('mousemove', handleMouseMove, options);
+    document.addEventListener('mouseup', handleMouseUp, options);
+    // Also listen on window in case document events don't fire
+    window.addEventListener('mousemove', handleMouseMove, options);
+    window.addEventListener('mouseup', handleMouseUp, options);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove, options);
+      document.removeEventListener('mouseup', handleMouseUp, options);
+      window.removeEventListener('mousemove', handleMouseMove, options);
+      window.removeEventListener('mouseup', handleMouseUp, options);
     };
   }, [isResizing, minWidthPx, maxWidthPx]);
 
@@ -490,20 +504,27 @@ export const SelfContainedOverlay: React.FC = () => {
               bottom: '0',
               width: '4px',
               minWidth: '4px',
-              zIndex: 10,
+              zIndex: 1000,
               cursor: 'ew-resize',
               position: 'absolute',
               pointerEvents: 'auto',
               userSelect: 'none',
+              touchAction: 'none',
+              WebkitUserSelect: 'none',
+              MozUserSelect: 'none',
+              msUserSelect: 'none',
             } as React.CSSProperties}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              console.log('[TaskMapr] Resize handle mousedown');
               handleResizeStart(e);
             }}
             onDragStart={(e) => {
               e.preventDefault();
+              return false;
             }}
+            draggable={false}
           >
             {/* Invisible wider hit area for easier grabbing */}
             <div
