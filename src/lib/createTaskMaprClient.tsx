@@ -3,6 +3,7 @@ import { TaskMaprProvider } from '../contexts/TaskMaprContext';
 import { SelfContainedOverlay } from '../components/SelfContainedOverlay';
 import { collectAgentContext } from './contextCollector';
 import { AgentOrchestratorResponse } from './agentOrchestrator';
+import { HttpAgentOrchestrator } from './HttpAgentOrchestrator';
 
 const DEFAULT_OPTIONS: Partial<TaskMaprClientOptions> = {
   framework: 'openai-agents' as AgentFramework,
@@ -16,13 +17,29 @@ const DEFAULT_OPTIONS: Partial<TaskMaprClientOptions> = {
     backoff: 1000,
   },
   overlay: {
-    title: 'AI Assistant',
-    placeholder: 'Ask me anything...',
+    title: 'TaskMapr Assistant',
+    placeholder: 'Ask me about forms, menus, or navigation...',
     showTimestamps: true,
     enableHighlighting: true,
     position: 'bottom-right' as const,
   },
 };
+
+const createDefaultInitialMessages = (): Message[] => [
+  {
+    id: 'taskmapr-welcome-1',
+    role: 'assistant',
+    content: [
+      'Hello! I can help you navigate this React-Admin dashboard.',
+      '',
+      'Try asking:',
+      '- "How do I create a new post?"',
+      '- "Show me the users menu"',
+      '- "Help me fill out this form"',
+    ].join('\n'),
+    timestamp: new Date(),
+  },
+];
 
 interface NormalizedAssistantPayload {
   id?: string;
@@ -60,10 +77,8 @@ export function createTaskMaprClient(
   agentEndpoint: string,
   options: TaskMaprClientOptions = {}
 ): TaskMaprClient {
-  // Allow empty endpoint if mockMode is enabled
-  if (!agentEndpoint && !options.mockMode) {
-    console.warn('TaskMapr: No agentEndpoint provided and mockMode not enabled. Enabling mockMode automatically.');
-  }
+  const normalizedEndpoint = (agentEndpoint || '').trim();
+  const shouldUseMockMode = options.mockMode ?? normalizedEndpoint.length === 0;
 
   // Merge options with defaults
   let config: TaskMaprClientOptions = {
@@ -83,6 +98,30 @@ export function createTaskMaprClient(
       }),
     },
   };
+
+  config.mockMode = shouldUseMockMode;
+
+  if (!config.mockMode && normalizedEndpoint) {
+    if (!config.orchestrator) {
+      config.orchestrator = {
+        orchestrator: new HttpAgentOrchestrator(normalizedEndpoint, {
+          timeout: options.timeout ?? DEFAULT_OPTIONS.timeout ?? 60000,
+        }),
+        includeDomSnapshots: true,
+      };
+    } else if (config.orchestrator.includeDomSnapshots === undefined) {
+      config.orchestrator = {
+        ...config.orchestrator,
+        includeDomSnapshots: true,
+      };
+    }
+  } else if (!normalizedEndpoint && !options.mockMode) {
+    console.warn('TaskMapr: No agentEndpoint provided. Falling back to mock mode.');
+  }
+
+  if (!config.initialMessages || config.initialMessages.length === 0) {
+    config.initialMessages = createDefaultInitialMessages();
+  }
 
   // Track message history for orchestrator
   const messageHistory: Message[] = [];

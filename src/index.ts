@@ -14,6 +14,11 @@ export { useHighlightable } from './hooks/useHighlightable';
 export { useVisibleComponents } from './hooks/useVisibleComponents';
 export { useVisibleHtmlIds } from './hooks/useVisibleHtmlIds';
 export { useTaskMaprActionHandlers, navigateToPath } from './hooks/useTaskMaprActionHandlers';
+export {
+  useTaskMaprClientInstance,
+  type UseTaskMaprClientInstanceOptions,
+  type UseTaskMaprClientInstanceResult,
+} from './hooks/useTaskMaprClientInstance';
 
 // Utility functions
 export { isElementVisible, isElementFullyVisible } from './utils/visibility';

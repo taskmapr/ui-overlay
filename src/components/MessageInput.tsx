@@ -50,8 +50,8 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-500'
           )}
           style={{
-            minHeight: '38px',
-            height: Math.min(38 + (message.split('\n').length - 1) * 20, 128) + 'px'
+            minHeight: '80px',
+            height: Math.min(80 + (message.split('\n').length - 1) * 24, 200) + 'px'
           }}
         />
         <button

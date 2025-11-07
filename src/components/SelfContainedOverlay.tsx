@@ -489,7 +489,6 @@ export const SelfContainedOverlay: React.FC = () => {
           'fixed top-0 right-0 h-screen shadow-2xl z-10',
           'flex flex-col transition-transform duration-300 ease-out',
           isResizing && 'transition-none',
-          'pt-[72px]', // Add padding for header
           theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
         )}
         style={{
@@ -505,7 +504,7 @@ export const SelfContainedOverlay: React.FC = () => {
           transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           WebkitTransform: isOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: isResizing ? 'none' : 'transform 0.3s ease-out',
-          paddingTop: '72px',
+          paddingTop: '0px',
           backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
           color: theme === 'dark' ? '#ffffff' : '#111827',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
@@ -523,7 +522,7 @@ export const SelfContainedOverlay: React.FC = () => {
               isResizing && 'bg-chat-primary'
             )}
             style={{
-              top: '72px',
+              top: '0px',
               left: '0',
               bottom: '0',
               width: '4px',

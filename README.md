@@ -68,7 +68,7 @@ const taskmapr = createTaskMaprClient(
     framework: 'openai-agents',
     model: 'gpt-4o',
     overlay: {
-      title: 'AI Assistant',
+      title: 'TaskMapr Assistant',
       showTimestamps: true,
     },
     initialMessages: [{
@@ -101,80 +101,40 @@ The [react-admin](https://marmelab.com/react-admin/) example in this repo (`exam
 
 1. Import the CSS bundle once (usually in `App.tsx`).
 2. Wrap your app with `HighlightProvider` so highlighting and walkthroughs work.
-3. Create a tiny integration component that configures the client and renders the bundled overlay via a portal.
+3. Create a tiny integration component that configures the client and returns the bundled overlay.
 
 ```tsx
 // src/taskmaprIntegration.tsx
-import { useMemo, useState, useEffect } from 'react';
 import {
-  createTaskMaprClient,
-  HttpAgentOrchestrator,
+  useTaskMaprClientInstance,
   useTaskMaprActionHandlers,
 } from '@taskmapr/ui-overlay';
-import { createPortal } from 'react-dom';
 
 export const TaskMaprOverlay = () => {
-  const [portalElement, setPortalElement] = useState<HTMLDivElement | null>(null);
   const actionHandlers = useTaskMaprActionHandlers();
+  const agentEndpoint =
+    import.meta.env.VITE_TASKMAPR_ENDPOINT ??
+    'http://localhost:8000/api/taskmapr/orchestrate';
 
-  const taskmapr = useMemo(() => {
-    const agentEndpoint =
-      import.meta.env.VITE_TASKMAPR_ENDPOINT ??
-      'http://localhost:8000/api/taskmapr/orchestrate';
+  const { Overlay } = useTaskMaprClientInstance({
+    agentEndpoint,
+    actionHandlers,
+  });
 
-    return createTaskMaprClient(agentEndpoint, {
-      orchestrator: agentEndpoint
-        ? {
-            orchestrator: new HttpAgentOrchestrator(agentEndpoint, {
-              timeout: 60_000,
-            }),
-            includeDomSnapshots: true,
-          }
-        : undefined,
-      mockMode: !agentEndpoint,
-      overlay: {
-        title: 'AI Assistant',
-        placeholder: 'Ask me about forms, menus, or navigation...',
-        showTimestamps: true,
-        enableHighlighting: true,
-      },
-      initialMessages: [
-        {
-          id: '1',
-          role: 'assistant',
-          content:
-            'Hello! I can help you navigate this React-Admin dashboard.\n\nTry asking:\n• "How do I create a new post?"\n• "Show me the users menu"\n• "Help me fill out this form"',
-          timestamp: new Date(),
-        },
-      ],
-      actionHandlers,
-    });
-  }, [actionHandlers]);
-
-  const Overlay = taskmapr.Overlay;
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-
-    const portalDiv = document.createElement('div');
-    portalDiv.id = 'taskmapr-overlay-portal';
-    portalDiv.className = 'tm-root';
-    document.body.appendChild(portalDiv);
-    setPortalElement(portalDiv);
-
-    return () => {
-      portalDiv.remove();
-      setPortalElement(null);
-    };
-  }, []);
-
-  if (!portalElement) {
-    return null;
-  }
-
-  return createPortal(<Overlay />, portalElement);
+  return <Overlay />;
 };
 ```
+
+That's it—the overlay bundle takes care of portal mounting, DOM isolation, and the default orchestrator configuration. Provide an endpoint and handlers, and you're done.
+
+`useTaskMaprClientInstance` memoizes the underlying client for you; pass any additional triggers with the optional `extraDependencies` array if needed.
+
+### Hook Parameters
+
+- `agentEndpoint` – URL for your orchestrator/agent endpoint. Leave blank to fall back to the package mock mode.
+- `actionHandlers` – Object returned by `useTaskMaprActionHandlers()` (or your own implementation) so the overlay can trigger navigation/highlighting.
+- `options` – Any additional `TaskMaprClientOptions` you want to override (model, overlay theme, etc.). You generally don't need to pass `actionHandlers` here; the top-level prop takes precedence if both are supplied.
+- `extraDependencies` – Optional array of values that should force the client to refresh (for example, when swapping API keys at runtime).
 
 Use it inside your admin shell:
 
@@ -220,7 +180,7 @@ const taskmapr = createTaskMaprClient(agentEndpoint, {
     includeDomSnapshots: true,
   },
   overlay: {
-    title: 'AI Assistant',
+    title: 'TaskMapr Assistant',
     placeholder: 'Ask me anything...',
   },
 });
