@@ -95,6 +95,111 @@ function App() {
 
 **Minimal Setup**: Just two imports and you're ready to go. No CSS overrides, no configuration files - the library handles everything internally.
 
+## React Admin Integration Example
+
+The [react-admin](https://marmelab.com/react-admin/) example in this repo (`examples/simple`) demonstrates a production-style setup. The integration boils down to:
+
+1. Import the CSS bundle once (usually in `App.tsx`).
+2. Wrap your app with `HighlightProvider` so highlighting and walkthroughs work.
+3. Create a tiny integration component that configures the client and renders the bundled overlay via a portal.
+
+```tsx
+// src/taskmaprIntegration.tsx
+import { useMemo, useState, useEffect } from 'react';
+import {
+  createTaskMaprClient,
+  HttpAgentOrchestrator,
+  useTaskMaprActionHandlers,
+} from '@taskmapr/ui-overlay';
+import { createPortal } from 'react-dom';
+
+export const TaskMaprOverlay = () => {
+  const [portalElement, setPortalElement] = useState<HTMLDivElement | null>(null);
+  const actionHandlers = useTaskMaprActionHandlers();
+
+  const taskmapr = useMemo(() => {
+    const agentEndpoint =
+      import.meta.env.VITE_TASKMAPR_ENDPOINT ??
+      'http://localhost:8000/api/taskmapr/orchestrate';
+
+    return createTaskMaprClient(agentEndpoint, {
+      orchestrator: agentEndpoint
+        ? {
+            orchestrator: new HttpAgentOrchestrator(agentEndpoint, {
+              timeout: 60_000,
+            }),
+            includeDomSnapshots: true,
+          }
+        : undefined,
+      mockMode: !agentEndpoint,
+      overlay: {
+        title: 'AI Assistant',
+        placeholder: 'Ask me about forms, menus, or navigation...',
+        showTimestamps: true,
+        enableHighlighting: true,
+      },
+      initialMessages: [
+        {
+          id: '1',
+          role: 'assistant',
+          content:
+            'Hello! I can help you navigate this React-Admin dashboard.\n\nTry asking:\n• "How do I create a new post?"\n• "Show me the users menu"\n• "Help me fill out this form"',
+          timestamp: new Date(),
+        },
+      ],
+      actionHandlers,
+    });
+  }, [actionHandlers]);
+
+  const Overlay = taskmapr.Overlay;
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+
+    const portalDiv = document.createElement('div');
+    portalDiv.id = 'taskmapr-overlay-portal';
+    portalDiv.className = 'tm-root';
+    document.body.appendChild(portalDiv);
+    setPortalElement(portalDiv);
+
+    return () => {
+      portalDiv.remove();
+      setPortalElement(null);
+    };
+  }, []);
+
+  if (!portalElement) {
+    return null;
+  }
+
+  return createPortal(<Overlay />, portalElement);
+};
+```
+
+Use it inside your admin shell:
+
+```tsx
+// src/App.tsx
+import '@taskmapr/ui-overlay/taskmapr-overlay.css';
+import { HighlightProvider } from '@taskmapr/ui-overlay';
+import { Admin, Resource } from 'react-admin';
+import { TaskMaprOverlay } from './taskmaprIntegration';
+
+export const App = () => (
+  <HighlightProvider>
+    <Admin dataProvider={dataProvider}>
+      <Resource name="posts" />
+      {/* ... */}
+    </Admin>
+    <TaskMaprOverlay />
+  </HighlightProvider>
+);
+```
+
+`useTaskMaprActionHandlers` wires navigation, highlighting, scrolling, and clicking back into the overlay automatically by reusing the library's highlight context. You can override any handler if your app needs custom behaviour.
+
+👉 See `examples/simple` for the full working project.
+
 ## AI Agent Integration
 
 ### HTTP Agent Orchestrator (Recommended)
