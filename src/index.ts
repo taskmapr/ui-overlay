@@ -13,6 +13,7 @@ export { HighlightProvider, useHighlight } from './contexts/HighlightContext';
 export { useHighlightable } from './hooks/useHighlightable';
 export { useVisibleComponents } from './hooks/useVisibleComponents';
 export { useVisibleHtmlIds } from './hooks/useVisibleHtmlIds';
+export { useTaskMaprActionHandlers, navigateToPath } from './hooks/useTaskMaprActionHandlers';
 
 // Utility functions
 export { isElementVisible, isElementFullyVisible } from './utils/visibility';

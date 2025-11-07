@@ -40,12 +40,24 @@ export const SelfContainedOverlay: React.FC = () => {
   const processedMessageIdsRef = useRef<Set<string>>(new Set());
   const isResizingRef = useRef(false);
   
-  // Ensure we're mounted to document.body via portal
-  const [mounted, setMounted] = useState(false);
+  const [portalElement, setPortalElement] = useState<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      setMounted(true);
+    if (typeof document === 'undefined') {
+      return;
     }
+
+    const portalDiv = document.createElement('div');
+    portalDiv.id = 'taskmapr-overlay-portal';
+    portalDiv.className = 'tm-root';
+    document.body.appendChild(portalDiv);
+    setPortalElement(portalDiv);
+
+    return () => {
+      if (portalDiv.parentNode) {
+        document.body.removeChild(portalDiv);
+      }
+      setPortalElement(null);
+    };
   }, []);
 
   // Configuration with defaults
@@ -374,7 +386,7 @@ export const SelfContainedOverlay: React.FC = () => {
   }, []);
 
   // SSR guard - don't render until mounted
-  if (!mounted || typeof document === 'undefined') {
+  if (!portalElement || typeof document === 'undefined') {
     return null;
   }
 
@@ -667,6 +679,5 @@ export const SelfContainedOverlay: React.FC = () => {
     </div>
   );
 
-  // Portal to document.body to ensure visibility and escape any parent stacking contexts
-  return createPortal(overlayContent, document.body);
+  return createPortal(overlayContent, portalElement);
 };

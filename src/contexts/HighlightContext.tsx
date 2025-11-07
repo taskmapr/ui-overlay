@@ -20,7 +20,7 @@ interface HighlightContextType {
   getVisibleComponents: () => HighlightableComponent[];
 }
 
-const HighlightContext = createContext<HighlightContextType | undefined>(undefined);
+export const HighlightContext = createContext<HighlightContextType | undefined>(undefined);
 
 export const HighlightProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [highlightedSelectors, setHighlightedSelectors] = useState<Set<string>>(new Set());
@@ -557,6 +557,10 @@ export const HighlightProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       {children}
     </HighlightContext.Provider>
   );
+};
+
+export const useHighlightOptional = () => {
+  return useContext(HighlightContext);
 };
 
 export const useHighlight = () => {
