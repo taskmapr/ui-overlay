@@ -32,7 +32,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "npm run build:types && vite build",
+    "build": "vite build && npm run build:types",
     "build:types": "tsc --project tsconfig.build.json",
     "preview": "vite preview",
     "type-check": "tsc --noEmit",
