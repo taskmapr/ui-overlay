@@ -6,7 +6,7 @@ export const AboutPage = () => {
       <div className="mb-8">
         <Link 
           to="/" 
-          className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4"
+          className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 no-underline"
         >
           ← Back to Home
         </Link>
@@ -23,7 +23,7 @@ export const AboutPage = () => {
         id="about-intro"
         data-highlight-keywords="introduction, intro, overview"
         data-highlight-description="Project introduction"
-        className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-8"
+        className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md mb-8"
       >
         <h2 className="text-2xl font-semibold mb-4 text-green-400">
           📖 What is TaskMapr?
@@ -43,7 +43,7 @@ export const AboutPage = () => {
         id="about-philosophy"
         data-highlight-keywords="philosophy, design, principles, approach"
         data-highlight-description="Design philosophy and principles"
-        className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-8"
+        className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md mb-8"
       >
         <h2 className="text-2xl font-semibold mb-4 text-blue-400">
           💡 Design Philosophy
@@ -72,31 +72,31 @@ export const AboutPage = () => {
         id="about-use-cases"
         data-highlight-keywords="use cases, examples, applications, scenarios"
         data-highlight-description="Common use cases and applications"
-        className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-8"
+        className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md mb-8"
       >
         <h2 className="text-2xl font-semibold mb-4 text-purple-400">
           🎯 Use Cases
         </h2>
         <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-slate-950 rounded-lg p-4 border border-slate-800/60">
             <div className="text-lg font-semibold text-purple-400 mb-2">User Onboarding</div>
             <p className="text-sm text-gray-400">
               Guide new users through your application with interactive walkthroughs
             </p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-slate-950 rounded-lg p-4 border border-slate-800/60">
             <div className="text-lg font-semibold text-blue-400 mb-2">Feature Announcements</div>
             <p className="text-sm text-gray-400">
               Highlight new features and show users how to use them
             </p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-slate-950 rounded-lg p-4 border border-slate-800/60">
             <div className="text-lg font-semibold text-green-400 mb-2">Contextual Help</div>
             <p className="text-sm text-gray-400">
               Provide in-context assistance by highlighting relevant UI elements
             </p>
           </div>
-          <div className="bg-gray-900 rounded-lg p-4">
+          <div className="bg-slate-950 rounded-lg p-4 border border-slate-800/60">
             <div className="text-lg font-semibold text-yellow-400 mb-2">Interactive Demos</div>
             <p className="text-sm text-gray-400">
               Create engaging product demos that users can interact with
@@ -108,7 +108,7 @@ export const AboutPage = () => {
       <div 
         id="about-footer"
         data-highlight-keywords="footer, github, open source, contribute"
-        className="bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-lg p-8 border border-green-500/20 text-center"
+        className="bg-slate-900 rounded-xl p-8 border border-slate-800 shadow-lg text-center"
       >
         <h2 className="text-2xl font-semibold mb-4">
           🌟 Open Source
@@ -122,13 +122,13 @@ export const AboutPage = () => {
             href="https://github.com/yourusername/taskmapr"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
+            className="px-6 py-3 bg-slate-950 hover:bg-slate-800 rounded-lg transition-colors border border-slate-800/60"
           >
             View on GitHub
           </a>
           <Link 
             to="/features" 
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors no-underline shadow-md"
           >
             Explore Features
           </Link>

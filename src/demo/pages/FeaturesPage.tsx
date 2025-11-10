@@ -6,7 +6,7 @@ export const FeaturesPage = () => {
       <div className="mb-8">
         <Link 
           to="/" 
-          className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4"
+          className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 no-underline"
         >
           ← Back to Home
         </Link>
@@ -24,7 +24,7 @@ export const FeaturesPage = () => {
           id="features-ui"
           data-highlight-keywords="ui, user interface, design, styling"
           data-highlight-description="UI and styling features"
-          className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700"
+          className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md"
         >
           <h2 className="text-2xl font-semibold mb-4 text-purple-400">
             🎨 Beautiful UI
@@ -53,7 +53,7 @@ export const FeaturesPage = () => {
           id="features-interaction"
           data-highlight-keywords="interaction, interactive, chat, messaging"
           data-highlight-description="Interactive chat features"
-          className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700"
+          className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md"
         >
           <h2 className="text-2xl font-semibold mb-4 text-blue-400">
             💬 Chat Features
@@ -82,7 +82,7 @@ export const FeaturesPage = () => {
           id="features-highlighting"
           data-highlight-keywords="highlighting, highlight, ui elements, scanner"
           data-highlight-description="UI highlighting capabilities"
-          className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700"
+          className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md"
         >
           <h2 className="text-2xl font-semibold mb-4 text-green-400">
             🎯 Smart Highlighting
@@ -111,7 +111,7 @@ export const FeaturesPage = () => {
           id="features-walkthroughs"
           data-highlight-keywords="walkthrough, tour, guided, onboarding"
           data-highlight-description="Walkthrough and tour features"
-          className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700"
+          className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md"
         >
           <h2 className="text-2xl font-semibold mb-4 text-yellow-400">
             🚶 Guided Tours
@@ -141,7 +141,7 @@ export const FeaturesPage = () => {
         id="features-technical"
         data-highlight-keywords="technical, tech stack, typescript, react"
         data-highlight-description="Technical details and stack"
-        className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-lg p-8 border border-purple-500/20"
+        className="bg-slate-900 rounded-xl p-8 border border-slate-800 shadow-lg"
       >
         <h2 className="text-2xl font-semibold mb-4 text-pink-400">
           ⚙️ Technical Stack
@@ -150,19 +150,19 @@ export const FeaturesPage = () => {
           Built with modern web technologies:
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-slate-950 rounded-lg p-3 text-center border border-slate-800/60">
             <div className="text-2xl mb-1">⚛️</div>
             <div className="text-sm text-gray-300">React 18</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-slate-950 rounded-lg p-3 text-center border border-slate-800/60">
             <div className="text-2xl mb-1">📘</div>
             <div className="text-sm text-gray-300">TypeScript</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-slate-950 rounded-lg p-3 text-center border border-slate-800/60">
             <div className="text-2xl mb-1">🎨</div>
             <div className="text-sm text-gray-300">Tailwind CSS</div>
           </div>
-          <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+          <div className="bg-slate-950 rounded-lg p-3 text-center border border-slate-800/60">
             <div className="text-2xl mb-1">⚡</div>
             <div className="text-sm text-gray-300">Vite</div>
           </div>
@@ -172,7 +172,7 @@ export const FeaturesPage = () => {
       <div className="mt-8 text-center">
         <Link 
           to="/about" 
-          className="inline-flex items-center text-blue-400 hover:text-blue-300"
+          className="inline-flex items-center text-blue-400 hover:text-blue-300 no-underline"
         >
           Learn more about the project →
         </Link>

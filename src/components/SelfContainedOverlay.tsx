@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Message } from '../types';
 import { MessageList } from './MessageList';
@@ -34,6 +34,18 @@ export const SelfContainedOverlay: React.FC = () => {
   const [currentWidth, setCurrentWidth] = useState(320);
   const [isResizing, setIsResizing] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const headerButtonStyles = useMemo<React.CSSProperties>(() => ({
+    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
+    color: theme === 'dark' ? '#f9fafb' : '#111827',
+    border: `1px solid ${theme === 'dark' ? '#374151' : '#d1d5db'}`,
+    borderColor: theme === 'dark' ? '#374151' : '#d1d5db',
+    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+  }), [theme]);
+  const headerButtonHoverStyles = useMemo(() => ({
+    backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
+    color: theme === 'dark' ? '#f9fafb' : '#111827',
+    borderColor: theme === 'dark' ? '#4b5563' : '#cbd5f5',
+  }), [theme]);
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const streamingMessageIdRef = useRef<string | null>(null);
@@ -59,6 +71,17 @@ export const SelfContainedOverlay: React.FC = () => {
       setPortalElement(null);
     };
   }, []);
+
+  useEffect(() => {
+    if (!portalElement) {
+      return;
+    }
+
+    portalElement.setAttribute('data-tm-theme', theme);
+    return () => {
+      portalElement.removeAttribute('data-tm-theme');
+    };
+  }, [portalElement, theme]);
 
   // Configuration with defaults
   const title = overlayConfig?.title || 'Chat';
@@ -256,6 +279,38 @@ export const SelfContainedOverlay: React.FC = () => {
     }
   }, [isOpen]);
 
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const root = document.documentElement;
+    if (isOpen) {
+      root.classList.add('taskmapr-overlay-open');
+    } else {
+      root.classList.remove('taskmapr-overlay-open');
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const root = document.documentElement;
+    const widthValue = isOpen ? `${currentWidth}px` : '0px';
+    root.style.setProperty('--taskmapr-overlay-width', widthValue);
+  }, [isOpen, currentWidth]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') {
+      return;
+    }
+    const root = document.documentElement;
+    return () => {
+      root.classList.remove('taskmapr-overlay-open');
+      root.style.removeProperty('--taskmapr-overlay-width');
+    };
+  }, []);
+
   const handleResizeStart = useCallback((e: React.MouseEvent) => {
     if (!resizable) return;
     e.preventDefault();
@@ -311,69 +366,6 @@ export const SelfContainedOverlay: React.FC = () => {
     window.addEventListener('mouseup', handleMouseUp, options);
   }, [resizable, currentWidth, minWidthPx, maxWidthPx]);
 
-  // Handle body padding and main content container to push content
-  useEffect(() => {
-    if (typeof document === 'undefined') return;
-    
-    const marginValue = isOpen ? `${currentWidth}px` : '0px';
-    const transition = isResizing ? 'none' : 'padding-right 0.3s ease-out, margin-right 0.3s ease-out';
-    
-    // Adjust body padding (more reliable than margin for overflow)
-    document.body.style.paddingRight = marginValue;
-    document.body.style.transition = transition;
-    
-    // Also adjust main content containers that might be used by React Admin
-    // Try common selectors for main content areas
-    const mainContentSelectors = [
-      '#root > div',
-      'main',
-      '[role="main"]',
-      '.MuiContainer-root',
-      '.ra-layout-content',
-      '.ra-layout',
-    ];
-    
-    const adjustedElements: HTMLElement[] = [];
-    
-    mainContentSelectors.forEach(selector => {
-      const elements = document.querySelectorAll<HTMLElement>(selector);
-      elements.forEach(el => {
-        // Only adjust if it's a direct child of body or within a reasonable container
-        if (el.offsetParent !== null) {
-          const originalPadding = el.style.paddingRight || '';
-          const originalMargin = el.style.marginRight || '';
-          
-          el.style.paddingRight = marginValue;
-          el.style.marginRight = marginValue;
-          el.style.transition = transition;
-          
-          adjustedElements.push(el);
-          
-          // Store original values for cleanup
-          if (!el.dataset.tmOriginalPadding) {
-            el.dataset.tmOriginalPadding = originalPadding;
-            el.dataset.tmOriginalMargin = originalMargin;
-          }
-        }
-      });
-    });
-
-    return () => {
-      document.body.style.paddingRight = '';
-      document.body.style.marginRight = '';
-      document.body.style.transition = '';
-      
-      // Restore original values
-      adjustedElements.forEach(el => {
-        el.style.paddingRight = el.dataset.tmOriginalPadding || '';
-        el.style.marginRight = el.dataset.tmOriginalMargin || '';
-        el.style.transition = '';
-        delete el.dataset.tmOriginalPadding;
-        delete el.dataset.tmOriginalMargin;
-      });
-    };
-  }, [isOpen, currentWidth, isResizing]);
-
   // Cleanup resize state when component unmounts
   useEffect(() => {
     return () => {
@@ -391,7 +383,7 @@ export const SelfContainedOverlay: React.FC = () => {
   }
 
   const overlayContent = (
-    <div className="tm-overlay-root">
+    <div className="tm-overlay-root" data-tm-theme={theme}>
       <HighlightScanner enabled={enableHighlighting} />
       
       {/* Toggle Button */}
@@ -613,6 +605,23 @@ export const SelfContainedOverlay: React.FC = () => {
               )}
               aria-label="Toggle theme"
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              style={headerButtonStyles}
+              onMouseEnter={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.backgroundColor = headerButtonHoverStyles.backgroundColor;
+                btn.style.color = headerButtonHoverStyles.color;
+                if (headerButtonHoverStyles.borderColor) {
+                  btn.style.borderColor = headerButtonHoverStyles.borderColor;
+                }
+              }}
+              onMouseLeave={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.backgroundColor = headerButtonStyles.backgroundColor as string;
+                btn.style.color = headerButtonStyles.color as string;
+                if (headerButtonStyles.borderColor) {
+                  btn.style.borderColor = headerButtonStyles.borderColor as string;
+                }
+              }}
             >
               {theme === 'dark' ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -639,6 +648,23 @@ export const SelfContainedOverlay: React.FC = () => {
                   : 'hover:bg-gray-200'
               )}
               aria-label="Close chat"
+              style={headerButtonStyles}
+              onMouseEnter={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.backgroundColor = headerButtonHoverStyles.backgroundColor;
+                btn.style.color = headerButtonHoverStyles.color;
+                if (headerButtonHoverStyles.borderColor) {
+                  btn.style.borderColor = headerButtonHoverStyles.borderColor;
+                }
+              }}
+              onMouseLeave={(e) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.backgroundColor = headerButtonStyles.backgroundColor as string;
+                btn.style.color = headerButtonStyles.color as string;
+                if (headerButtonStyles.borderColor) {
+                  btn.style.borderColor = headerButtonStyles.borderColor as string;
+                }
+              }}
             >
               <svg
                 className="w-5 h-5"

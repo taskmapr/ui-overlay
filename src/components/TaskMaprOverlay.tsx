@@ -74,22 +74,6 @@ export const TaskMaprOverlay: React.FC<TaskMaprOverlayProps> = ({
     resizeStartWidth.current = currentWidth;
   };
 
-  // Handle body margin to push content
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.marginRight = `${currentWidth}px`;
-      document.body.style.transition = isResizing ? 'none' : 'margin-right 0.3s ease-out';
-    } else {
-      document.body.style.marginRight = '0px';
-      document.body.style.transition = 'margin-right 0.3s ease-out';
-    }
-
-    return () => {
-      document.body.style.marginRight = '0px';
-      document.body.style.transition = '';
-    };
-  }, [isOpen, currentWidth, isResizing]);
-
   // Handle resize drag
   useEffect(() => {
     if (!isResizing) return;

@@ -26,6 +26,30 @@ export function injectFallbackCSS() {
 
   const css = `
     /* TaskMapr Overlay Fallback CSS - Minimal critical styles */
+    #taskmapr-overlay-portal {
+      --tm-sidebar-bg: #111827;
+      --tm-sidebar-text: #ffffff;
+      --tm-sidebar-border: #374151;
+      --tm-sidebar-header-bg: #1f2937;
+      --tm-sidebar-message-bg: #111827;
+      --tm-sidebar-input-bg: #1f2937;
+      --tm-input-bg: #374151;
+      --tm-input-border: #4b5563;
+      --tm-link-color: #60a5fa;
+      --tm-link-hover: #93c5fd;
+    }
+    #taskmapr-overlay-portal[data-tm-theme="light"] {
+      --tm-sidebar-bg: #ffffff;
+      --tm-sidebar-text: #111827;
+      --tm-sidebar-border: #e5e7eb;
+      --tm-sidebar-header-bg: #f3f4f6;
+      --tm-sidebar-message-bg: #ffffff;
+      --tm-sidebar-input-bg: #f9fafb;
+      --tm-input-bg: #ffffff;
+      --tm-input-border: #d1d5db;
+      --tm-link-color: #2563eb;
+      --tm-link-hover: #1d4ed8;
+    }
     .tm-launcher { 
       position: fixed !important; 
       right: 24px !important; 
@@ -68,8 +92,8 @@ export function injectFallbackCSS() {
       width: 320px !important;
       min-width: 280px !important;
       height: 100vh !important;
-      background: #111827 !important;
-      color: #fff !important;
+      background: var(--tm-sidebar-bg) !important;
+      color: var(--tm-sidebar-text) !important;
       box-shadow: -4px 0 24px rgba(0,0,0,.3) !important;
       pointer-events: auto !important;
       display: flex !important;

@@ -106,6 +106,29 @@
   height: 100% !important;
   pointer-events: none !important;
   isolation: isolate !important;
+  --tm-sidebar-bg: #111827;
+  --tm-sidebar-text: #ffffff;
+  --tm-sidebar-border: #374151;
+  --tm-sidebar-header-bg: #1f2937;
+  --tm-sidebar-message-bg: #111827;
+  --tm-sidebar-input-bg: #1f2937;
+  --tm-input-bg: #374151;
+  --tm-input-border: #4b5563;
+  --tm-link-color: #60a5fa;
+  --tm-link-hover: #93c5fd;
+}
+
+#taskmapr-overlay-portal[data-tm-theme="light"] {
+  --tm-sidebar-bg: #ffffff;
+  --tm-sidebar-text: #111827;
+  --tm-sidebar-border: #e5e7eb;
+  --tm-sidebar-header-bg: #f3f4f6;
+  --tm-sidebar-message-bg: #ffffff;
+  --tm-sidebar-input-bg: #f9fafb;
+  --tm-input-bg: #ffffff;
+  --tm-input-border: #d1d5db;
+  --tm-link-color: #2563eb;
+  --tm-link-hover: #1d4ed8;
 }
 
 #taskmapr-overlay-portal > * {
@@ -182,15 +205,15 @@
   z-index: 99998 !important;
   display: flex !important;
   flex-direction: column !important;
-  background-color: #111827 !important;
-  color: white !important;
+  background-color: var(--tm-sidebar-bg) !important;
+  color: var(--tm-sidebar-text) !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
   visibility: visible !important;
   opacity: 1 !important;
   overflow: hidden !important;
   margin: 0 !important;
   padding: 0 !important;
-  padding-top: 72px !important;
+  padding-top: 0 !important;
   box-sizing: border-box !important;
   isolation: isolate !important;
 }
@@ -226,9 +249,9 @@
   align-items: center !important;
   justify-content: space-between !important;
   padding: 12px 16px !important;
-  border-bottom: 1px solid #374151 !important;
-  background-color: #1f2937 !important;
-  color: white !important;
+  border-bottom: 1px solid var(--tm-sidebar-border) !important;
+  background-color: var(--tm-sidebar-header-bg) !important;
+  color: var(--tm-sidebar-text) !important;
   width: 100% !important;
   flex-shrink: 0 !important;
   margin: 0 !important;
@@ -243,7 +266,7 @@
   font-weight: 600 !important;
   margin: 0 !important;
   padding: 0 !important;
-  color: white !important;
+  color: var(--tm-sidebar-text) !important;
   display: block !important;
 }
 
@@ -256,8 +279,8 @@
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  background-color: #111827 !important;
-  color: white !important;
+  background-color: var(--tm-sidebar-message-bg) !important;
+  color: var(--tm-sidebar-text) !important;
   width: 100% !important;
   margin: 0 !important;
   padding: 16px !important;
@@ -270,9 +293,9 @@
 #taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] > div:last-of-type,
 #taskmapr-overlay-portal > div > div[style*="position: fixed"] > div:last-of-type,
 #taskmapr-overlay-portal > div > div[style*="position:fixed"] > div:last-of-type {
-  border-top: 1px solid #374151 !important;
-  background-color: #1f2937 !important;
-  color: white !important;
+  border-top: 1px solid var(--tm-sidebar-border) !important;
+  background-color: var(--tm-sidebar-input-bg) !important;
+  color: var(--tm-sidebar-text) !important;
   width: 100% !important;
   flex-shrink: 0 !important;
   margin: 0 !important;
@@ -303,9 +326,9 @@
 #taskmapr-overlay-portal > div > div[style*="position:fixed"] input,
 #taskmapr-overlay-portal > div > div[style*="position: fixed"] textarea,
 #taskmapr-overlay-portal > div > div[style*="position:fixed"] textarea {
-  background-color: #374151 !important;
-  color: white !important;
-  border: 1px solid #4b5563 !important;
+  background-color: var(--tm-input-bg) !important;
+  color: var(--tm-sidebar-text) !important;
+  border: 1px solid var(--tm-input-border) !important;
   width: 100% !important;
   max-width: 100% !important;
   padding: 8px 12px !important;
@@ -332,7 +355,7 @@
 #taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] a,
 #taskmapr-overlay-portal > div > div[style*="position: fixed"] a,
 #taskmapr-overlay-portal > div > div[style*="position:fixed"] a {
-  color: #60a5fa !important;
+  color: var(--tm-link-color) !important;
   text-decoration: none !important;
 }
 
@@ -340,5 +363,5 @@
 #taskmapr-overlay-portal div[style*="position:fixed"][style*="right"] a:hover,
 #taskmapr-overlay-portal > div > div[style*="position: fixed"] a:hover,
 #taskmapr-overlay-portal > div > div[style*="position:fixed"] a:hover {
-  color: #93c5fd !important;
+  color: var(--tm-link-hover) !important;
 }

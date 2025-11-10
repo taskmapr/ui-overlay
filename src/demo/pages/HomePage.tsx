@@ -25,7 +25,7 @@ export const HomePage = () => {
         id="home-navigation"
         data-highlight-keywords="navigation, nav, links, menu"
         data-highlight-description="Navigation links to other pages"
-        className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-8"
+        className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md mb-8"
       >
         <h2 className="text-2xl font-semibold mb-4 text-blue-400">
           🧭 Explore
@@ -33,14 +33,14 @@ export const HomePage = () => {
         <div className="space-y-3">
           <Link 
             to="/features" 
-            className="block p-3 bg-gray-900 hover:bg-gray-700 rounded-lg transition-colors"
+            className="block p-3 bg-slate-950 hover:bg-slate-800 rounded-lg transition-colors no-underline shadow-sm"
           >
             <span className="text-lg font-semibold text-purple-400">✨ Features</span>
             <p className="text-sm text-gray-400">Discover what TaskMapr can do</p>
           </Link>
           <Link 
             to="/about" 
-            className="block p-3 bg-gray-900 hover:bg-gray-700 rounded-lg transition-colors"
+            className="block p-3 bg-slate-950 hover:bg-slate-800 rounded-lg transition-colors no-underline shadow-sm"
           >
             <span className="text-lg font-semibold text-green-400">📖 About</span>
             <p className="text-sm text-gray-400">Learn more about the project</p>
@@ -52,7 +52,7 @@ export const HomePage = () => {
         id="home-quickstart"
         data-highlight-keywords="quick start, quickstart, install, setup, installation, getting started"
         data-highlight-description="Installation and setup instructions"
-        className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-6 border border-gray-700 mb-8"
+        className="bg-slate-900 rounded-xl p-6 border border-slate-800 shadow-md mb-8"
       >
         <h2 className="text-2xl font-semibold mb-4 text-purple-400">
           🚀 Quick Start
@@ -60,13 +60,13 @@ export const HomePage = () => {
         <div className="space-y-4 text-gray-300 text-sm">
           <div>
             <p className="mb-2">1. Install the package:</p>
-            <code className="block bg-gray-900 px-3 py-2 rounded text-green-400 overflow-x-auto break-words">
+            <code className="block bg-slate-950 px-3 py-2 rounded text-green-400 overflow-x-auto break-words shadow-inner">
               npm install @taskmapr/ui-overlay
             </code>
           </div>
           <div>
             <p className="mb-2">2. Import and use:</p>
-            <code className="block bg-gray-900 px-3 py-2 rounded text-blue-300 overflow-x-auto">
+            <code className="block bg-slate-950 px-3 py-2 rounded text-blue-300 overflow-x-auto shadow-inner">
               {`import { TaskMaprOverlay } from '@taskmapr/ui-overlay'`}
             </code>
           </div>
@@ -77,7 +77,7 @@ export const HomePage = () => {
         id="home-demo"
         data-highlight-keywords="demo, try, example, test, try it out, chat"
         data-highlight-description="Try it out section with keyboard shortcuts"
-        className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-8 border border-blue-500/20"
+        className="bg-slate-900 rounded-xl p-8 border border-slate-800 shadow-lg"
       >
         <h2 className="text-2xl font-semibold mb-4">
           👉 Try it out!
@@ -87,13 +87,13 @@ export const HomePage = () => {
         </p>
         <div className="flex gap-4">
           <div className="flex items-center gap-2 text-sm text-gray-400">
-            <kbd className="px-2 py-1 bg-gray-800 rounded border border-gray-700">
+            <kbd className="px-2 py-1 bg-slate-950 rounded border border-slate-700 shadow-inner">
               Enter
             </kbd>
             <span>Send message</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-400">
-            <kbd className="px-2 py-1 bg-gray-800 rounded border border-gray-700">
+            <kbd className="px-2 py-1 bg-slate-950 rounded border border-slate-700 shadow-inner">
               Shift+Enter
             </kbd>
             <span>New line</span>
