@@ -31,7 +31,7 @@ export const SelfContainedOverlay: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentWidth, setCurrentWidth] = useState(320);
+  const [currentWidth, setCurrentWidth] = useState(360);
   const [isResizing, setIsResizing] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const headerButtonStyles = useMemo<React.CSSProperties>(() => ({
@@ -89,8 +89,8 @@ export const SelfContainedOverlay: React.FC = () => {
   const showTimestamps = overlayConfig?.showTimestamps ?? true;
   const enableHighlighting = overlayConfig?.enableHighlighting ?? true;
   const resizable = true;
-  const minWidthPx = 280;
-  const maxWidthPx = 600;
+  const minWidthPx = 320;
+  const maxWidthPx = 640;
 
       // Handle streaming message updates via onMessageReceived callback
   useEffect(() => {
@@ -582,6 +582,7 @@ export const SelfContainedOverlay: React.FC = () => {
               fontWeight: 600,
               margin: 0,
               padding: 0,
+              color: theme === 'dark' ? '#ffffff' : '#111827',
             } as React.CSSProperties}
           >
             {title}

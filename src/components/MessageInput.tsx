@@ -24,14 +24,26 @@ export const MessageInput: React.FC<MessageInputProps> = ({
     }
   };
 
+  const lineCount = message.split('\n').length;
+  const dynamicHeight = Math.min(124 + (lineCount - 1) * 32, 240);
+  const sendButtonClassName = cn(
+    'px-5 py-3 rounded-lg bg-blue-600 text-white font-medium text-base',
+    'hover:bg-blue-700 transition-colors shadow-sm',
+    'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600',
+    'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+    theme === 'dark' ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-gray-100'
+  );
+
   return (
-    <div className={cn(
-      "border-t p-4",
-      theme === 'dark' 
-        ? 'border-gray-700 bg-gray-800' 
-        : 'border-gray-300 bg-gray-100'
-    )}>
-      <div className="flex gap-2">
+    <div
+      className={cn(
+        'border-t px-5 py-6',
+        theme === 'dark'
+          ? 'border-gray-700 bg-gray-800'
+          : 'border-gray-300 bg-gray-100'
+      )}
+    >
+      <div className="flex gap-3 items-end">
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -41,30 +53,20 @@ export const MessageInput: React.FC<MessageInputProps> = ({
           rows={1}
           className={cn(
             'flex-1 resize-none rounded-md border',
-            'px-3 py-2 text-sm',
+            'px-4 py-4 text-base leading-relaxed',
             'focus:outline-none focus:ring-2 focus:ring-blue-500',
             'disabled:opacity-50 disabled:cursor-not-allowed',
-            'max-h-32 overflow-y-auto',
+            'max-h-56 overflow-y-auto',
             theme === 'dark'
               ? 'bg-gray-900 border-gray-600 text-white placeholder:text-gray-400'
               : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-500'
           )}
           style={{
-            minHeight: '80px',
-            height: Math.min(80 + (message.split('\n').length - 1) * 24, 200) + 'px'
+            minHeight: '124px',
+            height: `${dynamicHeight}px`,
           }}
         />
-        <button
-          onClick={handleSend}
-          disabled={!message.trim() || disabled}
-          className={cn(
-            'px-4 py-2 rounded-md bg-blue-600 text-white font-medium',
-            'hover:bg-blue-700 transition-colors',
-            'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600',
-            'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
-            theme === 'dark' ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-gray-100'
-          )}
-        >
+        <button onClick={handleSend} disabled={!message.trim() || disabled} className={sendButtonClassName}>
           <svg
             className="w-5 h-5"
             fill="none"

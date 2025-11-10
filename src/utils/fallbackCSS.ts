@@ -89,8 +89,8 @@ export function injectFallbackCSS() {
       top: 0 !important;
       right: 0 !important;
       bottom: 0 !important;
-      width: 320px !important;
-      min-width: 280px !important;
+      width: 360px !important;
+      min-width: 320px !important;
       height: 100vh !important;
       background: var(--tm-sidebar-bg) !important;
       color: var(--tm-sidebar-text) !important;
