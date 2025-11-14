@@ -8,19 +8,6 @@
 
 A beautiful, fully-featured overlay component that adds AI chat, UI highlighting, and interactive walkthroughs to any React app. Think "Cursor for websites."
 
-## Features
-
-- Self-contained chat overlay with full AI chat
-- Agent SDK integration with OpenAI Agents SDK, Swarm, or custom backends
-- Full context (prompt, history, DOM) sent to your agent
-- Smart UI highlighting - auto-discover elements by ID or keywords
-- Guided walkthroughs for interactive product tours
-- Full TypeScript support with complete type definitions
-- Beautiful dark theme out of the box
-- All styles bundled - no CSS overrides needed
-- Zero config - works with mock responses when no backend is connected
-- Easy setup - just `npm install` and one CSS import
-
 ## Installation
 
 ```bash
@@ -102,70 +89,6 @@ function App() {
 
 **Minimal Setup**: Just two imports and you're ready to go. No CSS overrides, no configuration files - the library handles everything internally.
 
-## React Admin Integration Example
-
-The [react-admin](https://marmelab.com/react-admin/) example in this repo (`examples/simple`) demonstrates a production-style setup. The integration boils down to:
-
-1. Import the CSS bundle once (usually in `App.tsx`).
-2. Wrap your app with `HighlightProvider` so highlighting and walkthroughs work.
-3. Create a tiny integration component that configures the client and returns the bundled overlay.
-
-```tsx
-// src/taskmaprIntegration.tsx
-import {
-  useTaskMaprClientInstance,
-  useTaskMaprActionHandlers,
-} from '@taskmapr/ui-overlay';
-
-export const TaskMaprOverlay = () => {
-  const actionHandlers = useTaskMaprActionHandlers();
-  const agentEndpoint =
-    import.meta.env.VITE_TASKMAPR_ENDPOINT ??
-    'http://localhost:8000/api/taskmapr/orchestrate';
-
-  const { Overlay } = useTaskMaprClientInstance({
-    agentEndpoint,
-    actionHandlers,
-  });
-
-  return <Overlay />;
-};
-```
-
-That's it—the overlay bundle takes care of portal mounting, DOM isolation, and the default orchestrator configuration. Provide an endpoint and handlers, and you're done.
-
-`useTaskMaprClientInstance` memoizes the underlying client for you; pass any additional triggers with the optional `extraDependencies` array if needed.
-
-### Hook Parameters
-
-- `agentEndpoint` – URL for your orchestrator/agent endpoint. Leave blank to fall back to the package mock mode.
-- `actionHandlers` – Object returned by `useTaskMaprActionHandlers()` (or your own implementation) so the overlay can trigger navigation/highlighting.
-- `options` – Any additional `TaskMaprClientOptions` you want to override (model, overlay theme, etc.). You generally don't need to pass `actionHandlers` here; the top-level prop takes precedence if both are supplied.
-- `extraDependencies` – Optional array of values that should force the client to refresh (for example, when swapping API keys at runtime).
-
-Use it inside your admin shell:
-
-```tsx
-// src/App.tsx
-import '@taskmapr/ui-overlay/taskmapr-overlay.css';
-import { HighlightProvider } from '@taskmapr/ui-overlay';
-import { Admin, Resource } from 'react-admin';
-import { TaskMaprOverlay } from './taskmaprIntegration';
-
-export const App = () => (
-  <HighlightProvider>
-    <Admin dataProvider={dataProvider}>
-      <Resource name="posts" />
-      {/* ... */}
-    </Admin>
-    <TaskMaprOverlay />
-  </HighlightProvider>
-);
-```
-
-`useTaskMaprActionHandlers` wires navigation, highlighting, scrolling, and clicking back into the overlay automatically by reusing the library's highlight context. You can override any handler if your app needs custom behaviour.
-
-👉 See `examples/simple` for the full working project.
 
 ## AI Agent Integration
 
@@ -199,42 +122,6 @@ const taskmapr = createTaskMaprClient(agentEndpoint, {
 - ✅ Reasoning and tool call notifications
 - ✅ Automatic error handling and retries
 - ✅ Works with TaskMapr orchestrator backend
-
-### Custom Agent SDK Orchestration
-
-Use this when you want full control over agent orchestration with tools that have knowledge of your repo and workflows.
-
-```tsx
-import { createTaskMaprClient, AgentOrchestrator } from '@taskmapr/ui-overlay';
-
-class MyAgentOrchestrator implements AgentOrchestrator {
-  async orchestrate(context) {
-    // context includes: prompt, history, domElements, pageContext
-    const response = await myAgentSDK.run({
-      prompt: context.prompt,
-      history: context.history,
-      domElements: context.domElements,
-      tools: [repoKnowledgeTool, workflowTool],
-    });
-    return { message: response };
-  }
-}
-
-const taskmapr = createTaskMaprClient('', {
-  orchestrator: {
-    orchestrator: new MyAgentOrchestrator(),
-    includeDomSnapshots: true,
-  },
-});
-```
-
-**What your agent receives:**
-- Current user prompt
-- Full conversation history
-- All visible DOM elements (IDs, text, classes, positions, interactivity)
-- Page context (URL, title)
-- Active walkthrough state
-
 
 ## Highlighting
 
