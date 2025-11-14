@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Message } from '../types';
 import { MessageList } from './MessageList';
@@ -6,7 +6,6 @@ import { MessageInput } from './MessageInput';
 import { HighlightScanner } from './HighlightScanner';
 import { useTaskMaprClient } from '../contexts/TaskMaprContext';
 import { cn } from '../utils/cn';
-import { injectFallbackCSS } from '../utils/fallbackCSS';
 
 /**
  * Self-contained overlay that manages its own message state.
@@ -18,13 +17,6 @@ export const SelfContainedOverlay: React.FC = () => {
   const overlayConfig = client.getOverlayConfig();
   const clientConfig = client.getConfig();
   
-  // Inject fallback CSS on mount (safety net if host CSS isn't loaded)
-  useEffect(() => {
-    if (typeof document !== 'undefined') {
-      injectFallbackCSS();
-    }
-  }, []);
-  
   // Internal message state - fully managed by this component
   const [messages, setMessages] = useState<Message[]>(
     clientConfig.initialMessages || []
@@ -33,19 +25,9 @@ export const SelfContainedOverlay: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentWidth, setCurrentWidth] = useState(360);
   const [isResizing, setIsResizing] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const headerButtonStyles = useMemo<React.CSSProperties>(() => ({
-    backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
-    color: theme === 'dark' ? '#f9fafb' : '#111827',
-    border: `1px solid ${theme === 'dark' ? '#374151' : '#d1d5db'}`,
-    borderColor: theme === 'dark' ? '#374151' : '#d1d5db',
-    transition: 'background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease',
-  }), [theme]);
-  const headerButtonHoverStyles = useMemo(() => ({
-    backgroundColor: theme === 'dark' ? '#374151' : '#e5e7eb',
-    color: theme === 'dark' ? '#f9fafb' : '#111827',
-    borderColor: theme === 'dark' ? '#4b5563' : '#cbd5f5',
-  }), [theme]);
+  const [theme, setTheme] = useState<'light' | 'dark'>(
+    overlayConfig?.defaultTheme || 'light'
+  );
   const resizeStartX = useRef(0);
   const resizeStartWidth = useRef(0);
   const streamingMessageIdRef = useRef<string | null>(null);
@@ -266,18 +248,8 @@ export const SelfContainedOverlay: React.FC = () => {
     setTheme((prev) => prev === 'dark' ? 'light' : 'dark');
   };
 
-  // Use ref to access panel element and update transform when isOpen changes
+  // Use ref to access panel element for dynamic width
   const panelRef = useRef<HTMLDivElement>(null);
-  
-  // Update transform when isOpen changes
-  useEffect(() => {
-    if (panelRef.current) {
-      const transform = isOpen ? 'translateX(0)' : 'translateX(100%)';
-      panelRef.current.style.setProperty('transform', transform, 'important');
-      panelRef.current.style.setProperty('-webkit-transform', transform, 'important');
-      panelRef.current.style.setProperty('pointer-events', isOpen ? 'auto' : 'none', 'important');
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     if (typeof document === 'undefined') {
@@ -398,73 +370,22 @@ export const SelfContainedOverlay: React.FC = () => {
           e.stopPropagation();
         }}
         className={cn(
-          'fixed z-40 p-4 rounded-full bg-chat-primary hover:bg-chat-primary-hover',
-          'text-white shadow-lg transition-all duration-300',
-          'focus:outline-none focus:ring-2 focus:ring-chat-primary focus:ring-offset-2',
-          isOpen && 'opacity-0 pointer-events-none'
+          'tm-launcher',
+          isOpen && 'tm-launcher--hidden'
         )}
         style={{
-          // Critical inline styles to ensure visibility even without Tailwind
-          position: 'fixed',
-          zIndex: 2147483001,
-          bottom: '24px',
           right: isOpen ? `${currentWidth + 24}px` : '24px',
-          width: '56px',
-          height: '56px',
-          minWidth: '56px',
-          minHeight: '56px',
-          padding: '0',
-          margin: '0',
-          borderRadius: '50%',
-          backgroundColor: '#3b82f6',
-          color: 'white',
-          border: 'none',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          transition: isResizing ? 'none' : 'all 0.3s ease-out',
-          opacity: isOpen ? 0 : 1,
-          pointerEvents: isOpen ? 'none' : 'auto',
-          // Force these styles with !important via inline styles
-          background: '#3b82f6',
-          backgroundImage: 'none',
-          isolation: 'isolate',
+          transition: isResizing ? 'none' : undefined,
         } as React.CSSProperties}
         aria-label="Toggle chat"
         type="button"
-        onMouseEnter={(e) => {
-          if (!isOpen) {
-            const el = e.currentTarget as HTMLElement;
-            el.style.setProperty('background-color', '#2563eb', 'important');
-            el.style.setProperty('background', '#2563eb', 'important');
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isOpen) {
-            const el = e.currentTarget as HTMLElement;
-            el.style.setProperty('background-color', '#3b82f6', 'important');
-            el.style.setProperty('background', '#3b82f6', 'important');
-          }
-        }}
       >
         <svg
-          className="w-6 h-6"
+          className="tm-launcher__icon"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           viewBox="0 0 24 24"
-          style={{
-            width: '24px',
-            height: '24px',
-            minWidth: '24px',
-            minHeight: '24px',
-            display: 'block',
-            flexShrink: 0,
-            color: 'white',
-            stroke: 'white',
-          } as React.CSSProperties}
         >
           <path
             strokeLinecap="round"
@@ -478,57 +399,25 @@ export const SelfContainedOverlay: React.FC = () => {
       {/* Chat Panel - full height, but behind header */}
       <div
         className={cn(
-          'fixed top-0 right-0 h-screen shadow-2xl z-10',
-          'flex flex-col transition-transform duration-300 ease-out',
-          isResizing && 'transition-none',
-          theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+          'tm-sidebar',
+          isOpen && 'tm-sidebar--open',
+          isResizing && 'tm-sidebar--resizing',
+          theme === 'dark' ? 'tm-sidebar--dark' : 'tm-sidebar--light'
         )}
         style={{
           width: `${currentWidth}px`,
-          // Critical inline styles to ensure visibility even without Tailwind
-          position: 'fixed',
-          top: '0',
-          right: '0',
-          height: '100vh',
-          zIndex: 2147483000,
-          display: isOpen ? 'flex' : 'flex',
-          flexDirection: 'column',
-          transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          WebkitTransform: isOpen ? 'translateX(0)' : 'translateX(100%)',
-          transition: isResizing ? 'none' : 'transform 0.3s ease-out',
-          paddingTop: '0px',
-          backgroundColor: theme === 'dark' ? '#111827' : '#ffffff',
-          color: theme === 'dark' ? '#ffffff' : '#111827',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-          pointerEvents: isOpen ? 'auto' : 'none',
-          isolation: 'isolate',
         } as React.CSSProperties}
         ref={panelRef}
+        data-tm-open={isOpen}
+        data-tm-resizing={isResizing}
       >
         {/* Resize Handle */}
         {resizable && (
           <div
             className={cn(
-              'absolute left-0 bottom-0 cursor-ew-resize',
-              'hover:bg-chat-primary/50 transition-colors',
-              isResizing && 'bg-chat-primary'
+              'tm-sidebar__resize-handle',
+              isResizing && 'tm-sidebar__resize-handle--active'
             )}
-            style={{
-              top: '0px',
-              left: '0',
-              bottom: '0',
-              width: '4px',
-              minWidth: '4px',
-              zIndex: 1000,
-              cursor: 'ew-resize',
-              position: 'absolute',
-              pointerEvents: 'auto',
-              userSelect: 'none',
-              touchAction: 'none',
-              WebkitUserSelect: 'none',
-              MozUserSelect: 'none',
-              msUserSelect: 'none',
-            } as React.CSSProperties}
             onMouseDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -542,94 +431,29 @@ export const SelfContainedOverlay: React.FC = () => {
             draggable={false}
           >
             {/* Invisible wider hit area - extends left for easier grabbing */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '-8px',
-                top: '0',
-                bottom: '0',
-                width: '16px',
-                cursor: 'ew-resize',
-                pointerEvents: 'auto',
-                zIndex: 1001,
-              } as React.CSSProperties}
-            />
+            <div className="tm-sidebar__resize-handle-hit-area" />
           </div>
         )}
         
         {/* Header */}
-        <div 
-          className={cn(
-            "flex items-center justify-between px-4 py-3 border-b",
-            theme === 'dark' 
-              ? 'bg-gray-800 border-gray-700' 
-              : 'bg-gray-100 border-gray-300'
-          )}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '12px 16px',
-            borderBottom: `1px solid ${theme === 'dark' ? '#374151' : '#d1d5db'}`,
-            backgroundColor: theme === 'dark' ? '#1f2937' : '#f3f4f6',
-            color: theme === 'dark' ? '#ffffff' : '#111827',
-          } as React.CSSProperties}
-        >
-          <h2 
-            className="text-lg font-semibold"
-            style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              margin: 0,
-              padding: 0,
-              color: theme === 'dark' ? '#ffffff' : '#111827',
-            } as React.CSSProperties}
-          >
+        <div className="tm-sidebar__header">
+          <h2 className="tm-sidebar__title">
             {title}
           </h2>
-          <div 
-            className="flex items-center gap-2"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            } as React.CSSProperties}
-          >
+          <div className="tm-sidebar__header-actions">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={cn(
-                "p-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
-                theme === 'dark' 
-                  ? 'hover:bg-gray-700' 
-                  : 'hover:bg-gray-200'
-              )}
+              className="tm-sidebar__header-button tm-sidebar__header-button--theme"
               aria-label="Toggle theme"
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              style={headerButtonStyles}
-              onMouseEnter={(e) => {
-                const btn = e.currentTarget as HTMLButtonElement;
-                btn.style.backgroundColor = headerButtonHoverStyles.backgroundColor;
-                btn.style.color = headerButtonHoverStyles.color;
-                if (headerButtonHoverStyles.borderColor) {
-                  btn.style.borderColor = headerButtonHoverStyles.borderColor;
-                }
-              }}
-              onMouseLeave={(e) => {
-                const btn = e.currentTarget as HTMLButtonElement;
-                btn.style.backgroundColor = headerButtonStyles.backgroundColor as string;
-                btn.style.color = headerButtonStyles.color as string;
-                if (headerButtonStyles.borderColor) {
-                  btn.style.borderColor = headerButtonStyles.borderColor as string;
-                }
-              }}
             >
               {theme === 'dark' ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="tm-sidebar__header-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="tm-sidebar__header-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                 </svg>
               )}
@@ -642,33 +466,11 @@ export const SelfContainedOverlay: React.FC = () => {
                 toggleChat();
               }}
               type="button"
-              className={cn(
-                "p-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
-                theme === 'dark' 
-                  ? 'hover:bg-gray-700' 
-                  : 'hover:bg-gray-200'
-              )}
+              className="tm-sidebar__header-button tm-sidebar__header-button--close"
               aria-label="Close chat"
-              style={headerButtonStyles}
-              onMouseEnter={(e) => {
-                const btn = e.currentTarget as HTMLButtonElement;
-                btn.style.backgroundColor = headerButtonHoverStyles.backgroundColor;
-                btn.style.color = headerButtonHoverStyles.color;
-                if (headerButtonHoverStyles.borderColor) {
-                  btn.style.borderColor = headerButtonHoverStyles.borderColor;
-                }
-              }}
-              onMouseLeave={(e) => {
-                const btn = e.currentTarget as HTMLButtonElement;
-                btn.style.backgroundColor = headerButtonStyles.backgroundColor as string;
-                btn.style.color = headerButtonStyles.color as string;
-                if (headerButtonStyles.borderColor) {
-                  btn.style.borderColor = headerButtonStyles.borderColor as string;
-                }
-              }}
             >
               <svg
-                className="w-5 h-5"
+                className="tm-sidebar__header-button-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -685,22 +487,26 @@ export const SelfContainedOverlay: React.FC = () => {
         </div>
 
         {/* Messages */}
-        <MessageList 
-          messages={messages} 
-          showTimestamps={showTimestamps} 
-          enableHighlighting={enableHighlighting}
-          theme={theme}
-          isLoading={isLoading}
-          streamingMessageId={streamingMessageIdRef.current}
-        />
+        <div className="tm-sidebar__messages">
+          <MessageList 
+            messages={messages} 
+            showTimestamps={showTimestamps} 
+            enableHighlighting={enableHighlighting}
+            theme={theme}
+            isLoading={isLoading}
+            streamingMessageId={streamingMessageIdRef.current}
+          />
+        </div>
 
         {/* Input */}
-        <MessageInput
-          onSend={handleSendMessage}
-          placeholder={placeholder}
-          disabled={isLoading}
-          theme={theme}
-        />
+        <div className="tm-sidebar__input">
+          <MessageInput
+            onSend={handleSendMessage}
+            placeholder={placeholder}
+            disabled={isLoading}
+            theme={theme}
+          />
+        </div>
       </div>
     </div>
   );

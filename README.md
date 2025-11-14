@@ -29,13 +29,19 @@ npm install @taskmapr/ui-overlay
 
 ## Setup
 
-The library includes all necessary styles bundled. Simply import the CSS file:
+The library includes all necessary styles bundled. **You must import the CSS file** for the overlay to display correctly:
 
 ```tsx
 import '@taskmapr/ui-overlay/taskmapr-overlay.css';
 ```
 
-**That's it!** No additional CSS files or overrides needed. The library handles all styling internally.
+**Important**: The CSS import is required. The library uses scoped CSS with the `.tm-overlay-root` prefix to ensure complete isolation from your host application's styles. All styles are bundled into a single CSS file that is automatically included when you import the library.
+
+**No additional CSS files or overrides needed.** The library handles all styling internally with:
+- Scoped CSS selectors (prefixed with `.tm-overlay-root` in production)
+- CSS custom properties for theming
+- Zero runtime CSS injection
+- Complete isolation from host app styles
 
 ## 📚 Library vs Demo Code
 
@@ -70,6 +76,7 @@ const taskmapr = createTaskMaprClient(
     overlay: {
       title: 'TaskMapr Assistant',
       showTimestamps: true,
+      defaultTheme: 'light', // or 'dark' - defaults to 'light' if not specified
     },
     initialMessages: [{
       id: '1',

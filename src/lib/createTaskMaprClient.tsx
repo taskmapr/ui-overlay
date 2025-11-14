@@ -1,3 +1,6 @@
+// React is required for JSX with classic runtime (see vite.config.ts)
+// @ts-ignore - React is used implicitly by JSX transform
+import React from 'react';
 import { TaskMaprClient, TaskMaprClientOptions, Message, AgentFramework } from '../types';
 import { TaskMaprProvider } from '../contexts/TaskMaprContext';
 import { SelfContainedOverlay } from '../components/SelfContainedOverlay';
@@ -22,6 +25,7 @@ const DEFAULT_OPTIONS: Partial<TaskMaprClientOptions> = {
     showTimestamps: true,
     enableHighlighting: true,
     position: 'bottom-right' as const,
+    defaultTheme: 'light' as const,
   },
 };
 

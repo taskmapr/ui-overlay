@@ -159,6 +159,9 @@ export interface TaskMaprClientOptions {
     showTimestamps?: boolean;
     enableHighlighting?: boolean;
     position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+    /** Default theme mode (default: 'light') */
+    defaultTheme?: 'light' | 'dark';
+    /** Custom theme colors (optional) */
     theme?: {
       primaryColor?: string;
       backgroundColor?: string;
