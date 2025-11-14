@@ -24,28 +24,6 @@ import '@taskmapr/ui-overlay/taskmapr-overlay.css';
 
 **Important**: The CSS import is required. The library uses scoped CSS with the `.tm-overlay-root` prefix to ensure complete isolation from your host application's styles. All styles are bundled into a single CSS file that is automatically included when you import the library.
 
-**No additional CSS files or overrides needed.** The library handles all styling internally with:
-- Scoped CSS selectors (prefixed with `.tm-overlay-root` in production)
-- CSS custom properties for theming
-- Zero runtime CSS injection
-- Complete isolation from host app styles
-
-## 📚 Library vs Demo Code
-
-**Important**: This repository contains both:
-
-1. **Library code** (`/src/*`) - Exported after `npm install` ✅
-   - `createTaskMaprClient` - Client factory
-   - `HttpAgentOrchestrator` - HTTP-based orchestrator with SSE streaming
-   - `HighlightProvider`, `useHighlight` - Context and hooks
-   - All utility hooks and functions
-   - TypeScript types
-
-2. **Demo code** (`/src/demo/*`) - Example usage, NOT exported ⚠️
-   - Shows HOW to configure the library for your app
-   - `useTaskMapr` hook is demo-specific configuration
-   - You'll create your own version adapted to your needs
-
 ## Quick Start
 
 ```tsx
